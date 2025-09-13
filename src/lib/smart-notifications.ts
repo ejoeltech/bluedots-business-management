@@ -7,7 +7,7 @@ export interface NotificationContext {
     id: number
     name: string
     email: string
-    phone?: string
+    phone?: string | null
   }
   reminder: {
     id: number
@@ -15,7 +15,7 @@ export interface NotificationContext {
     nextDue: Date
     priority: ReminderPriority
     escalationLevel: number
-    templateId?: number
+    templateId?: number | null
   }
   template: {
     subject: string
