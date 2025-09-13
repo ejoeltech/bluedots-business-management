@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import Layout from '@/components/Layout'
-import { Plus, Edit, Trash2, Bell, Clock, Calendar } from 'lucide-react'
+import CommunicationHistory from '@/components/CommunicationHistory'
+import { Plus, Edit, Trash2, Bell, Clock, Calendar, MessageSquare } from 'lucide-react'
 
 interface Reminder {
   id: number
@@ -22,6 +23,7 @@ export default function RemindersPage() {
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
   const [editingReminder, setEditingReminder] = useState<Reminder | null>(null)
+  const [selectedReminderId, setSelectedReminderId] = useState<number | null>(null)
   const [formData, setFormData] = useState({
     customerId: '',
     product: 'Tubular Battery Servicing',
@@ -210,14 +212,23 @@ export default function RemindersPage() {
                     </div>
                     <div className="flex items-center space-x-2">
                       <button
+                        onClick={() => setSelectedReminderId(reminder.id)}
+                        className="text-blue-600 hover:text-blue-900"
+                        title="View Communication History"
+                      >
+                        <MessageSquare className="h-4 w-4" />
+                      </button>
+                      <button
                         onClick={() => handleEdit(reminder)}
                         className="text-indigo-600 hover:text-indigo-900"
+                        title="Edit Reminder"
                       >
                         <Edit className="h-4 w-4" />
                       </button>
                       <button
                         onClick={() => handleDelete(reminder.id)}
                         className="text-red-600 hover:text-red-900"
+                        title="Delete Reminder"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
@@ -337,6 +348,36 @@ export default function RemindersPage() {
           </div>
         )}
       </div>
+
+      {/* Communication History Modal */}
+      {selectedReminderId && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onClick={() => setSelectedReminderId(null)} />
+            
+            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
+              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg leading-6 font-medium text-gray-900">
+                    Communication History
+                  </h3>
+                  <button
+                    onClick={() => setSelectedReminderId(null)}
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    <span className="sr-only">Close</span>
+                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+                
+                <CommunicationHistory reminderId={selectedReminderId} />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </Layout>
   )
 }

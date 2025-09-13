@@ -5,10 +5,13 @@ import Layout from '@/components/Layout'
 import ConfigurationBackup from '@/components/ConfigurationBackup'
 import AppUpdateExport from '@/components/AppUpdateExport'
 import EmailSettings from '@/components/EmailSettings'
-import { Settings, User, Bell, Building, Palette, Database, Download, Mail } from 'lucide-react'
+import NotificationSettings from '@/components/NotificationSettings'
+import { Settings, User, Bell, Building, Palette, Database, Download, Mail, Zap } from 'lucide-react'
+import ReminderTemplates from '@/components/ReminderTemplates'
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState('company')
+  const [reminderSubTab, setReminderSubTab] = useState('settings')
   const [companySettings, setCompanySettings] = useState({
     name: 'Bluedots Technologies',
     address: '123 Business St, City, State 12345',
@@ -29,6 +32,7 @@ export default function SettingsPage() {
   const tabs = [
     { id: 'company', name: 'Company Info', icon: Building },
     { id: 'reminders', name: 'Reminders', icon: Bell },
+    { id: 'notifications', name: 'Notifications', icon: Zap },
     { id: 'email', name: 'Email Settings', icon: Mail },
     { id: 'appearance', name: 'Appearance', icon: Palette },
     { id: 'backup', name: 'Backup & Restore', icon: Download },
@@ -173,62 +177,105 @@ export default function SettingsPage() {
 
             {/* Reminder Settings */}
             {activeTab === 'reminders' && (
-              <form onSubmit={handleReminderSave} className="space-y-6">
+              <div className="space-y-6">
+                {/* Sub-tabs for Reminders */}
                 <div className="bg-white shadow px-4 py-5 sm:rounded-lg sm:p-6">
-                  <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-                    Reminder Settings
-                  </h3>
-                  <div className="space-y-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">
-                        Default Reminder Interval (days)
-                      </label>
-                      <input
-                        type="number"
-                        min="1"
-                        value={reminderSettings.defaultInterval}
-                        onChange={(e) => setReminderSettings({ ...reminderSettings, defaultInterval: parseInt(e.target.value) })}
-                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                      />
-                    </div>
-
-                    <div className="flex items-center">
-                      <input
-                        id="email-notifications"
-                        type="checkbox"
-                        checked={reminderSettings.emailNotifications}
-                        onChange={(e) => setReminderSettings({ ...reminderSettings, emailNotifications: e.target.checked })}
-                        className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                      />
-                      <label htmlFor="email-notifications" className="ml-2 block text-sm text-gray-900">
-                        Enable email notifications for reminders
-                      </label>
-                    </div>
-
-                    <div className="flex items-center">
-                      <input
-                        id="auto-send"
-                        type="checkbox"
-                        checked={reminderSettings.autoSend}
-                        onChange={(e) => setReminderSettings({ ...reminderSettings, autoSend: e.target.checked })}
-                        className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                      />
-                      <label htmlFor="auto-send" className="ml-2 block text-sm text-gray-900">
-                        Automatically send reminders when due
-                      </label>
-                    </div>
+                  <div className="border-b border-gray-200 mb-6">
+                    <nav className="-mb-px flex space-x-8">
+                      <button
+                        onClick={() => setReminderSubTab('settings')}
+                        className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm ${
+                          reminderSubTab === 'settings'
+                            ? 'border-indigo-500 text-indigo-600'
+                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                        }`}
+                      >
+                        Settings
+                      </button>
+                      <button
+                        onClick={() => setReminderSubTab('templates')}
+                        className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm ${
+                          reminderSubTab === 'templates'
+                            ? 'border-indigo-500 text-indigo-600'
+                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                        }`}
+                      >
+                        Templates
+                      </button>
+                    </nav>
                   </div>
 
-                  <div className="mt-6">
-                    <button
-                      type="submit"
-                      className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                    >
-                      Save Reminder Settings
-                    </button>
-                  </div>
+                  {/* Reminder Settings Sub-tab */}
+                  {reminderSubTab === 'settings' && (
+                    <form onSubmit={handleReminderSave} className="space-y-6">
+                      <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
+                        Reminder Settings
+                      </h3>
+                      <div className="space-y-6">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700">
+                            Default Reminder Interval (days)
+                          </label>
+                          <input
+                            type="number"
+                            min="1"
+                            value={reminderSettings.defaultInterval}
+                            onChange={(e) => setReminderSettings({ ...reminderSettings, defaultInterval: parseInt(e.target.value) })}
+                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                          />
+                        </div>
+
+                        <div className="flex items-center">
+                          <input
+                            id="email-notifications"
+                            type="checkbox"
+                            checked={reminderSettings.emailNotifications}
+                            onChange={(e) => setReminderSettings({ ...reminderSettings, emailNotifications: e.target.checked })}
+                            className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                          />
+                          <label htmlFor="email-notifications" className="ml-2 block text-sm text-gray-900">
+                            Enable email notifications for reminders
+                          </label>
+                        </div>
+
+                        <div className="flex items-center">
+                          <input
+                            id="auto-send"
+                            type="checkbox"
+                            checked={reminderSettings.autoSend}
+                            onChange={(e) => setReminderSettings({ ...reminderSettings, autoSend: e.target.checked })}
+                            className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                          />
+                          <label htmlFor="auto-send" className="ml-2 block text-sm text-gray-900">
+                            Automatically send reminders when due
+                          </label>
+                        </div>
+                      </div>
+
+                      <div className="mt-6">
+                        <button
+                          type="submit"
+                          className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        >
+                          Save Reminder Settings
+                        </button>
+                      </div>
+                    </form>
+                  )}
+
+                  {/* Reminder Templates Sub-tab */}
+                  {reminderSubTab === 'templates' && (
+                    <ReminderTemplates />
+                  )}
                 </div>
-              </form>
+              </div>
+            )}
+
+            {/* Notification Settings */}
+            {activeTab === 'notifications' && (
+              <div className="bg-white shadow px-4 py-5 sm:rounded-lg sm:p-6">
+                <NotificationSettings />
+              </div>
             )}
 
             {/* Email Settings */}
