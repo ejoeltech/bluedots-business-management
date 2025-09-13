@@ -95,6 +95,7 @@ export default function QuotesPage() {
     setFormData({
       customerId: quote.customer.name, // This should be the customer ID, but we'll handle it differently
       total: quote.total.toString(),
+      currency: quote.currency || 'NGN',
       status: quote.status
     })
     setShowModal(true)
