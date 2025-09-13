@@ -28,10 +28,39 @@ export default function DashboardCharts() {
     try {
       setLoading(true)
       const response = await fetch(`/api/dashboard/stats?range=${timeRange}`)
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      
       const data = await response.json()
-      setStats(data)
+      
+      // Ensure all required fields have default values
+      setStats({
+        totalRevenue: data.totalRevenue || 0,
+        totalCustomers: data.totalCustomers || 0,
+        totalProducts: data.totalProducts || 0,
+        pendingQuotes: data.pendingQuotes || 0,
+        unpaidInvoices: data.unpaidInvoices || 0,
+        overdueReminders: data.overdueReminders || 0,
+        monthlyRevenue: data.monthlyRevenue || [],
+        topCustomers: data.topCustomers || [],
+        recentActivity: data.recentActivity || []
+      })
     } catch (error) {
       console.error('Error fetching dashboard stats:', error)
+      // Set default stats to prevent crashes
+      setStats({
+        totalRevenue: 0,
+        totalCustomers: 0,
+        totalProducts: 0,
+        pendingQuotes: 0,
+        unpaidInvoices: 0,
+        overdueReminders: 0,
+        monthlyRevenue: [],
+        topCustomers: [],
+        recentActivity: []
+      })
     } finally {
       setLoading(false)
     }
@@ -154,23 +183,29 @@ export default function DashboardCharts() {
             <BarChart3 className="h-5 w-5 text-gray-400" />
           </div>
           <div className="h-64 flex items-end justify-between space-x-2">
-            {stats.monthlyRevenue.map((item, index) => {
-              const maxRevenue = Math.max(...stats.monthlyRevenue.map(r => r.revenue))
-              const height = (item.revenue / maxRevenue) * 100
-              
-              return (
-                <div key={index} className="flex flex-col items-center flex-1">
-                  <div
-                    className="bg-indigo-500 w-full rounded-t"
-                    style={{ height: `${height}%`, minHeight: '4px' }}
-                    title={`${item.month}: ₦${item.revenue.toLocaleString()}`}
-                  ></div>
-                  <span className="text-xs text-gray-500 mt-2 transform -rotate-45 origin-left">
-                    {item.month}
-                  </span>
-                </div>
-              )
-            })}
+            {stats.monthlyRevenue && stats.monthlyRevenue.length > 0 ? (
+              stats.monthlyRevenue.map((item, index) => {
+                const maxRevenue = Math.max(...stats.monthlyRevenue.map(r => r.revenue))
+                const height = maxRevenue > 0 ? (item.revenue / maxRevenue) * 100 : 0
+                
+                return (
+                  <div key={index} className="flex flex-col items-center flex-1">
+                    <div
+                      className="bg-indigo-500 w-full rounded-t"
+                      style={{ height: `${height}%`, minHeight: '4px' }}
+                      title={`${item.month}: ₦${item.revenue.toLocaleString()}`}
+                    ></div>
+                    <span className="text-xs text-gray-500 mt-2 transform -rotate-45 origin-left">
+                      {item.month}
+                    </span>
+                  </div>
+                )
+              })
+            ) : (
+              <div className="flex items-center justify-center w-full h-full text-gray-500">
+                No revenue data available
+              </div>
+            )}
           </div>
           <div className="mt-4 text-center text-sm text-gray-600">
             Monthly revenue breakdown for the selected period
@@ -184,25 +219,31 @@ export default function DashboardCharts() {
             <Users className="h-5 w-5 text-gray-400" />
           </div>
           <div className="space-y-4">
-            {stats.topCustomers.map((customer, index) => (
-              <div key={index} className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
-                    <span className="text-sm font-medium text-indigo-600">
-                      {index + 1}
-                    </span>
+            {stats.topCustomers && stats.topCustomers.length > 0 ? (
+              stats.topCustomers.map((customer, index) => (
+                <div key={index} className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
+                      <span className="text-sm font-medium text-indigo-600">
+                        {index + 1}
+                      </span>
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-sm font-medium text-gray-900">{customer.name}</p>
+                    </div>
                   </div>
-                  <div className="ml-3">
-                    <p className="text-sm font-medium text-gray-900">{customer.name}</p>
+                  <div className="text-right">
+                    <p className="text-sm font-semibold text-gray-900">
+                      ₦{customer.revenue.toLocaleString()}
+                    </p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-sm font-semibold text-gray-900">
-                    ₦{customer.revenue.toLocaleString()}
-                  </p>
-                </div>
+              ))
+            ) : (
+              <div className="text-center text-gray-500 py-8">
+                No customer data available
               </div>
-            ))}
+            )}
           </div>
           <div className="mt-4 text-center">
             <button className="text-sm text-indigo-600 hover:text-indigo-800 font-medium">
@@ -216,20 +257,26 @@ export default function DashboardCharts() {
       <div className="bg-white p-6 rounded-lg shadow">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
         <div className="space-y-3">
-          {stats.recentActivity.map((activity, index) => (
-            <div key={index} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
-              <div className="flex items-center">
-                <div className={`w-2 h-2 rounded-full mr-3 ${
-                  activity.type === 'invoice' ? 'bg-green-500' :
-                  activity.type === 'quote' ? 'bg-blue-500' :
-                  activity.type === 'customer' ? 'bg-purple-500' :
-                  'bg-gray-500'
-                }`}></div>
-                <span className="text-sm text-gray-900">{activity.description}</span>
+          {stats.recentActivity && stats.recentActivity.length > 0 ? (
+            stats.recentActivity.map((activity, index) => (
+              <div key={index} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
+                <div className="flex items-center">
+                  <div className={`w-2 h-2 rounded-full mr-3 ${
+                    activity.type === 'invoice' ? 'bg-green-500' :
+                    activity.type === 'quote' ? 'bg-blue-500' :
+                    activity.type === 'customer' ? 'bg-purple-500' :
+                    'bg-gray-500'
+                  }`}></div>
+                  <span className="text-sm text-gray-900">{activity.description}</span>
+                </div>
+                <span className="text-xs text-gray-500">{activity.date}</span>
               </div>
-              <span className="text-xs text-gray-500">{activity.date}</span>
+            ))
+          ) : (
+            <div className="text-center text-gray-500 py-8">
+              No recent activity
             </div>
-          ))}
+          )}
         </div>
       </div>
     </div>

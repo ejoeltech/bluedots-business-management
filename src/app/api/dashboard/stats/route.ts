@@ -109,19 +109,30 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    // Get top customers by revenue
-    const topCustomers = await prisma.$queryRaw`
-      SELECT 
-        c.name,
-        COALESCE(SUM(r.amount), 0) as revenue
-      FROM "Customer" c
-      LEFT JOIN "Invoice" i ON c.id = i."customerId"
-      LEFT JOIN "Receipt" r ON i.id = r."invoiceId"
-      WHERE r."createdAt" >= ${startDate}
-      GROUP BY c.id, c.name
-      ORDER BY revenue DESC
-      LIMIT 5
-    ` as Array<{ name: string; revenue: number }>
+    // Get top customers by revenue - use Prisma instead of raw SQL for better error handling
+    const topCustomersData = await prisma.customer.findMany({
+      include: {
+        invoices: {
+          include: {
+            receipts: {
+              where: {
+                createdAt: { gte: startDate }
+              }
+            }
+          }
+        }
+      }
+    })
+
+    const topCustomers = topCustomersData
+      .map(customer => ({
+        name: customer.name,
+        revenue: customer.invoices.reduce((total, invoice) => 
+          total + invoice.receipts.reduce((invoiceTotal, receipt) => 
+            invoiceTotal + receipt.amount, 0), 0)
+      }))
+      .sort((a, b) => b.revenue - a.revenue)
+      .slice(0, 5)
 
     // Get recent activity
     const recentActivity = await Promise.all([
@@ -184,9 +195,9 @@ export async function GET(request: NextRequest) {
       pendingQuotes,
       unpaidInvoices,
       overdueReminders,
-      monthlyRevenue,
-      topCustomers,
-      recentActivity: activities
+      monthlyRevenue: monthlyRevenue || [],
+      topCustomers: topCustomers || [],
+      recentActivity: activities || []
     })
 
   } catch (error) {

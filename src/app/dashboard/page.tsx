@@ -44,27 +44,27 @@ export default function DashboardPage() {
       ])
 
       const [customers, invoices, receipts, products, reminders] = await Promise.all([
-        customersRes.json(),
-        invoicesRes.json(),
-        receiptsRes.json(),
-        productsRes.json(),
-        remindersRes.json()
+        customersRes.ok ? customersRes.json() : [],
+        invoicesRes.ok ? invoicesRes.json() : [],
+        receiptsRes.ok ? receiptsRes.json() : [],
+        productsRes.ok ? productsRes.json() : [],
+        remindersRes.ok ? remindersRes.json() : []
       ])
 
-      const totalRevenue = receipts.reduce((sum: number, receipt: any) => sum + receipt.amount, 0)
-      const pendingInvoices = invoices.filter((invoice: any) => invoice.status === 'unpaid' || invoice.status === 'pending').length
+      const totalRevenue = Array.isArray(receipts) ? receipts.reduce((sum: number, receipt: any) => sum + (receipt.amount || 0), 0) : 0
+      const pendingInvoices = Array.isArray(invoices) ? invoices.filter((invoice: any) => invoice.status === 'unpaid' || invoice.status === 'pending').length : 0
       
       const today = new Date()
-      const overdueReminders = reminders.filter((reminder: any) => 
+      const overdueReminders = Array.isArray(reminders) ? reminders.filter((reminder: any) => 
         new Date(reminder.nextDue) < today
-      ).length
+      ).length : 0
 
       setStats({
-        customers: customers.length,
-        invoices: invoices.length,
-        receipts: receipts.length,
-        products: products.length,
-        reminders: reminders.length,
+        customers: Array.isArray(customers) ? customers.length : 0,
+        invoices: Array.isArray(invoices) ? invoices.length : 0,
+        receipts: Array.isArray(receipts) ? receipts.length : 0,
+        products: Array.isArray(products) ? products.length : 0,
+        reminders: Array.isArray(reminders) ? reminders.length : 0,
         totalRevenue,
         pendingInvoices,
         overdueReminders
