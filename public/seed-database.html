@@ -88,6 +88,10 @@
             <strong>Purpose:</strong> This tool will set up your database with default users and sample data for the Bluedots Technologies Business Management System.
         </div>
 
+        <div class="info" style="background: #FEF3C7; color: #92400E; border-color: #FDE68A;">
+            <strong>🔧 Enhanced Database Setup:</strong> This tool now includes comprehensive database schema creation. If the database tables don't exist, they will be created automatically before seeding.
+        </div>
+
         <button id="seedBtn" class="button" onclick="seedDatabase()">
             🌱 Seed Database
         </button>
@@ -122,7 +126,7 @@
 
             try {
                 // First, try to setup the database schema
-                btn.textContent = '⏳ Setting up database schema...';
+                btn.textContent = '⏳ Creating database schema...';
                 const setupResponse = await fetch('/api/setup-database', {
                     method: 'POST',
                     headers: {
@@ -130,8 +134,20 @@
                     }
                 });
 
+                const setupData = await setupResponse.json();
+
+                if (!setupResponse.ok) {
+                    throw new Error(`Database setup failed: ${setupData.error}`);
+                }
+
+                // Show schema creation status
+                if (setupData.schemaCreated) {
+                    btn.textContent = '✅ Schema created! Seeding data...';
+                } else {
+                    btn.textContent = '✅ Schema exists! Seeding data...';
+                }
+
                 // Now try to seed the database
-                btn.textContent = '⏳ Seeding Database...';
                 const seedResponse = await fetch('/api/seed', {
                     method: 'POST',
                     headers: {
@@ -145,6 +161,7 @@
                     result.className = 'result success';
                     result.innerHTML = `
                         <h3>✅ ${data.message}</h3>
+                        <p><strong>Database Setup:</strong> ${setupData.schemaCreated ? 'Schema created and ' : 'Existing schema '}data seeded successfully</p>
                         <p><strong>Created:</strong></p>
                         <ul>
                             <li>${data.data.users.length} users</li>
@@ -152,15 +169,15 @@
                             <li>${data.data.sampleData.customers} sample customer</li>
                             <li>${data.data.sampleData.reminders} sample reminder</li>
                         </ul>
-                        <p><strong>You can now log in with the credentials shown above!</strong></p>
+                        <p><strong>🎉 You can now log in with the credentials shown above!</strong></p>
                     `;
                 } else {
                     result.className = 'result error';
                     result.innerHTML = `
-                        <h3>❌ Error</h3>
+                        <h3>❌ Seeding Error</h3>
                         <p><strong>Message:</strong> ${data.error || 'Unknown error'}</p>
                         ${data.details ? `<p><strong>Details:</strong> ${data.details}</p>` : ''}
-                        <p><strong>Note:</strong> The database schema may not exist. This usually means the build process didn't run the database migration properly.</p>
+                        <p><strong>Note:</strong> Database schema was created successfully, but seeding failed. You can try again.</p>
                     `;
                 }
             } catch (error) {

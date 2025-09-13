@@ -1,29 +1,34 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
+import { initializeDatabase } from '@/lib/database-init'
 
 export async function POST(request: NextRequest) {
   try {
-    // This will create the database schema if it doesn't exist
-    await prisma.$executeRaw`SELECT 1`
+    console.log('🚀 Starting database initialization...')
     
-    // Try to create a simple test to see if tables exist
-    const userCount = await prisma.user.count()
+    const result = await initializeDatabase()
     
-    return NextResponse.json({ 
-      success: true, 
-      message: 'Database connection successful',
-      userCount 
-    })
+    if (result.success) {
+      return NextResponse.json({ 
+        success: true, 
+        message: result.schemaCreated 
+          ? 'Database schema created successfully' 
+          : 'Database connection successful - schema already exists',
+        schemaExists: result.schemaExists,
+        schemaCreated: result.schemaCreated
+      })
+    } else {
+      return NextResponse.json({ 
+        success: false, 
+        error: result.error,
+        details: 'Failed to initialize database schema'
+      }, { status: 500 })
+    }
   } catch (error: any) {
     console.error('Database setup error:', error)
     return NextResponse.json({ 
       success: false, 
       error: error.message,
-      details: 'Database schema may not exist. Please run prisma db push manually.'
+      details: 'Unexpected error during database setup'
     }, { status: 500 })
-  } finally {
-    await prisma.$disconnect()
   }
 }
