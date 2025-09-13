@@ -47,7 +47,7 @@ export async function PUT(
     }
 
     const body = await request.json()
-    const { name, type, stock, price } = body
+    const { name, type, stock, price, currency } = body
 
     if (!name || !type || stock === undefined || price === undefined) {
       return NextResponse.json({ error: 'All fields are required' }, { status: 400 })
@@ -59,7 +59,8 @@ export async function PUT(
         name,
         type,
         stock: parseInt(stock),
-        price: parseFloat(price)
+        price: parseFloat(price),
+        currency: currency || 'NGN'
       }
     })
 

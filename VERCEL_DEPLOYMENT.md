@@ -137,3 +137,4 @@ If you're using file uploads, consider:
 - Vercel Documentation: [vercel.com/docs](https://vercel.com/docs)
 - Next.js Documentation: [nextjs.org/docs](https://nextjs.org/docs)
 - Prisma Documentation: [prisma.io/docs](https://prisma.io/docs)
+

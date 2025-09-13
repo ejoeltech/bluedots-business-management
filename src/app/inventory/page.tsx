@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import Layout from '@/components/Layout'
+import CurrencySelector from '@/components/CurrencySelector'
 import { Plus, Edit, Trash2, Package, TrendingUp, TrendingDown } from 'lucide-react'
+import { formatCurrency } from '@/lib/currency'
 
 interface Product {
   id: number
@@ -10,6 +12,7 @@ interface Product {
   type: string
   stock: number
   price: number
+  currency: string
   createdAt: string
   _count: {
     invoices: number
@@ -25,7 +28,8 @@ export default function InventoryPage() {
     name: '',
     type: '',
     stock: '',
-    price: ''
+    price: '',
+    currency: 'NGN'
   })
 
   useEffect(() => {
@@ -65,7 +69,7 @@ export default function InventoryPage() {
       if (response.ok) {
         setShowModal(false)
         setEditingProduct(null)
-        setFormData({ name: '', type: '', stock: '', price: '' })
+        setFormData({ name: '', type: '', stock: '', price: '', currency: 'NGN' })
         fetchProducts()
       }
     } catch (error) {
@@ -79,7 +83,8 @@ export default function InventoryPage() {
       name: product.name,
       type: product.type,
       stock: product.stock.toString(),
-      price: product.price.toString()
+      price: product.price.toString(),
+      currency: product.currency || 'NGN'
     })
     setShowModal(true)
   }
@@ -156,7 +161,7 @@ export default function InventoryPage() {
             <button
               onClick={() => {
                 setEditingProduct(null)
-                setFormData({ name: '', type: '', stock: '', price: '' })
+                setFormData({ name: '', type: '', stock: '', price: '', currency: 'NGN' })
                 setShowModal(true)
               }}
               className="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
@@ -203,7 +208,7 @@ export default function InventoryPage() {
                       <div>
                         <p className="text-sm font-medium text-gray-500">Price</p>
                         <p className="text-lg font-semibold text-gray-900">
-                          ${product.price.toFixed(2)}
+                          {formatCurrency(product.price, product.currency)}
                         </p>
                       </div>
                     </div>
@@ -295,7 +300,7 @@ export default function InventoryPage() {
                         </div>
                         
                         <div>
-                          <label className="block text-sm font-medium text-gray-700">Price ($) *</label>
+                          <label className="block text-sm font-medium text-gray-700">Price *</label>
                           <input
                             type="number"
                             required
@@ -306,6 +311,15 @@ export default function InventoryPage() {
                             className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                           />
                         </div>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Currency *</label>
+                        <CurrencySelector
+                          value={formData.currency}
+                          onChange={(currency) => setFormData({ ...formData, currency })}
+                          className="mt-1 block w-full"
+                        />
                       </div>
                     </div>
                   </div>

@@ -66,6 +66,7 @@ export async function POST() {
         type: 'Distilled Water',
         stock: 100,
         price: 2.50,
+        currency: 'NGN',
       },
     })
 
@@ -75,6 +76,7 @@ export async function POST() {
         type: 'Battery',
         stock: 25,
         price: 150.00,
+        currency: 'NGN',
       },
     })
 

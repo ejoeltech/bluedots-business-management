@@ -106,6 +106,7 @@ async function createDatabaseSchema() {
       "type" TEXT NOT NULL,
       "stock" INTEGER NOT NULL DEFAULT 0,
       "price" DOUBLE PRECISION NOT NULL,
+      "currency" TEXT NOT NULL DEFAULT 'NGN',
       "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
       "updatedAt" TIMESTAMP(3) NOT NULL,
       CONSTRAINT "Product_pkey" PRIMARY KEY ("id")
@@ -119,6 +120,7 @@ async function createDatabaseSchema() {
       "customerId" INTEGER NOT NULL,
       "userId" INTEGER,
       "total" DOUBLE PRECISION NOT NULL,
+      "currency" TEXT NOT NULL DEFAULT 'NGN',
       "status" TEXT NOT NULL DEFAULT 'pending',
       "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
       "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -135,6 +137,7 @@ async function createDatabaseSchema() {
       "productId" INTEGER,
       "quantity" INTEGER NOT NULL DEFAULT 1,
       "total" DOUBLE PRECISION NOT NULL,
+      "currency" TEXT NOT NULL DEFAULT 'NGN',
       "status" TEXT NOT NULL DEFAULT 'unpaid',
       "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
       "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -149,6 +152,7 @@ async function createDatabaseSchema() {
       "invoiceId" INTEGER NOT NULL,
       "userId" INTEGER,
       "amount" DOUBLE PRECISION NOT NULL,
+      "currency" TEXT NOT NULL DEFAULT 'NGN',
       "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
       "updatedAt" TIMESTAMP(3) NOT NULL,
       CONSTRAINT "Receipt_pkey" PRIMARY KEY ("id")

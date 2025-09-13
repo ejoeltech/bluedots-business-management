@@ -3,7 +3,9 @@
 import { useState, useEffect } from 'react'
 import Layout from '@/components/Layout'
 import InvoicePDF from '@/components/InvoicePDF'
+import CurrencySelector from '@/components/CurrencySelector'
 import { Plus, Edit, Trash2, Eye, Download, Receipt } from 'lucide-react'
+import { formatCurrency } from '@/lib/currency'
 
 interface Invoice {
   id: number
@@ -14,9 +16,11 @@ interface Invoice {
   product?: {
     name: string
     price: number
+    currency: string
   }
   quantity: number
   total: number
+  currency: string
   status: string
   createdAt: string
   receipts: any[]
@@ -33,6 +37,7 @@ export default function InvoicesPage() {
     productId: '',
     quantity: '',
     total: '',
+    currency: 'NGN',
     status: 'unpaid'
   })
   const [customers, setCustomers] = useState<any[]>([])
@@ -90,7 +95,7 @@ export default function InvoicesPage() {
 
       if (response.ok) {
         setShowModal(false)
-        setFormData({ customerId: '', productId: '', quantity: '', total: '', status: 'unpaid' })
+        setFormData({ customerId: '', productId: '', quantity: '', total: '', currency: 'NGN', status: 'unpaid' })
         fetchInvoices()
         fetchProducts() // Refresh products to update stock
       }
@@ -190,7 +195,7 @@ export default function InvoicesPage() {
             </button>
             <button
               onClick={() => {
-                setFormData({ customerId: '', productId: '', quantity: '', total: '', status: 'unpaid' })
+                setFormData({ customerId: '', productId: '', quantity: '', total: '', currency: 'NGN', status: 'unpaid' })
                 setShowModal(true)
               }}
               className="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
@@ -253,7 +258,7 @@ export default function InvoicesPage() {
                           {invoice.quantity}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          ${invoice.total.toFixed(2)}
+                          {formatCurrency(invoice.total, invoice.currency)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <select
@@ -375,7 +380,7 @@ export default function InvoicesPage() {
                       </div>
                       
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">Total ($) *</label>
+                        <label className="block text-sm font-medium text-gray-700">Total *</label>
                         <input
                           type="number"
                           required
@@ -384,6 +389,15 @@ export default function InvoicesPage() {
                           value={formData.total}
                           onChange={(e) => setFormData({ ...formData, total: e.target.value })}
                           className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Currency *</label>
+                        <CurrencySelector
+                          value={formData.currency}
+                          onChange={(currency) => setFormData({ ...formData, currency })}
+                          className="mt-1 block w-full"
                         />
                       </div>
                       
