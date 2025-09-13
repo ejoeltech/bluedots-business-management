@@ -1,9 +1,23 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { initializeDatabase } from '@/lib/database-init'
 import bcrypt from 'bcryptjs'
 
 export async function POST() {
   try {
+    // First, ensure database schema exists
+    console.log('🔧 Ensuring database schema exists...')
+    const dbInitResult = await initializeDatabase()
+    
+    if (!dbInitResult.success) {
+      return NextResponse.json({ 
+        error: 'Failed to initialize database schema',
+        details: dbInitResult.error
+      }, { status: 500 })
+    }
+    
+    console.log('✅ Database schema ready, checking for existing data...')
+    
     // Check if users already exist
     const existingUsers = await prisma.user.findMany()
     if (existingUsers.length > 0) {
