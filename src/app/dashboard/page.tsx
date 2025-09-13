@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Layout from '@/components/Layout'
 import DashboardCharts from '@/components/DashboardCharts'
+import MobileDashboard from '@/components/MobileDashboard'
 import { Users, FileText, Receipt, Package, Bell, TrendingUp, DollarSign } from 'lucide-react'
 
 interface DashboardStats {
@@ -89,12 +90,19 @@ export default function DashboardPage() {
   return (
     <Layout>
       <div className="px-4 py-6 sm:px-0">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-          <p className="mt-2 text-sm text-gray-600">
-            Welcome to Bluedots Technologies Business Management System
-          </p>
+        {/* Mobile Dashboard */}
+        <div className="lg:hidden">
+          <MobileDashboard />
         </div>
+
+        {/* Desktop Dashboard */}
+        <div className="hidden lg:block">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+            <p className="mt-2 text-sm text-gray-600">
+              Welcome to Bluedots Technologies Business Management System
+            </p>
+          </div>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
@@ -278,9 +286,10 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Enhanced Analytics Dashboard */}
-        <div className="mt-8">
-          <DashboardCharts />
+          {/* Enhanced Analytics Dashboard */}
+          <div className="mt-8">
+            <DashboardCharts />
+          </div>
         </div>
       </div>
     </Layout>
