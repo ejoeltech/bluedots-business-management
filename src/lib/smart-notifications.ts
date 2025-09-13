@@ -116,14 +116,12 @@ export class SmartNotificationEngine {
     }
 
     try {
-      await emailService.sendReminderEmail(
+      await emailService.sendEmail(
         context.customer.email,
-        subject,
-        body,
         {
-          customerName: context.customer.name,
-          product: context.reminder.product,
-          dueDate: context.reminder.nextDue.toLocaleDateString()
+          subject,
+          html: body.replace(/\n/g, '<br>'),
+          text: body
         }
       )
 
