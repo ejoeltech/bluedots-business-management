@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react'
 import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
+import { formatCurrency } from '@/lib/currency'
 
 interface Invoice {
   id: number
@@ -15,9 +16,11 @@ interface Invoice {
   product?: {
     name: string
     price: number
+    currency: string
   }
   quantity: number
   total: number
+  currency: string
   status: string
   createdAt: string
 }
@@ -190,10 +193,10 @@ export default function InvoicePDF({
                   {invoice.quantity}
                 </td>
                 <td className="border border-gray-300 px-4 py-2 text-right text-sm text-gray-900">
-                  ${invoice.product?.price.toFixed(2) || (invoice.total / invoice.quantity).toFixed(2)}
+                  {formatCurrency(invoice.product?.price || (invoice.total / invoice.quantity), invoice.currency)}
                 </td>
                 <td className="border border-gray-300 px-4 py-2 text-right text-sm text-gray-900">
-                  ${invoice.total.toFixed(2)}
+                  {formatCurrency(invoice.total, invoice.currency)}
                 </td>
               </tr>
             </tbody>
@@ -205,15 +208,15 @@ export default function InvoicePDF({
           <div className="w-64">
             <div className="flex justify-between py-2 border-b border-gray-300">
               <span className="text-sm font-medium text-gray-900">Subtotal:</span>
-              <span className="text-sm text-gray-900">${invoice.total.toFixed(2)}</span>
+              <span className="text-sm text-gray-900">{formatCurrency(invoice.total, invoice.currency)}</span>
             </div>
             <div className="flex justify-between py-2 border-b border-gray-300">
               <span className="text-sm font-medium text-gray-900">Tax:</span>
-              <span className="text-sm text-gray-900">$0.00</span>
+              <span className="text-sm text-gray-900">{formatCurrency(0, invoice.currency)}</span>
             </div>
             <div className="flex justify-between py-4">
               <span className="text-lg font-bold text-gray-900">Total:</span>
-              <span className="text-lg font-bold text-gray-900">${invoice.total.toFixed(2)}</span>
+              <span className="text-lg font-bold text-gray-900">{formatCurrency(invoice.total, invoice.currency)}</span>
             </div>
           </div>
         </div>

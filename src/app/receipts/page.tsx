@@ -3,11 +3,14 @@
 import { useState, useEffect } from 'react'
 import Layout from '@/components/Layout'
 import ReceiptPDF from '@/components/ReceiptPDF'
+import CurrencySelector from '@/components/CurrencySelector'
 import { Plus, Edit, Trash2, Eye, Download, TrendingUp } from 'lucide-react'
+import { formatCurrency } from '@/lib/currency'
 
 interface Receipt {
   id: number
   amount: number
+  currency: string
   createdAt: string
   invoice: {
     id: number
@@ -20,6 +23,7 @@ interface Receipt {
     }
     quantity: number
     total: number
+    currency: string
     status: string
   }
 }
@@ -32,7 +36,8 @@ export default function ReceiptsPage() {
   const [selectedReceipt, setSelectedReceipt] = useState<Receipt | null>(null)
   const [formData, setFormData] = useState({
     invoiceId: '',
-    amount: ''
+    amount: '',
+    currency: 'NGN'
   })
   const [invoices, setInvoices] = useState<any[]>([])
 
@@ -81,7 +86,7 @@ export default function ReceiptsPage() {
 
       if (response.ok) {
         setShowModal(false)
-        setFormData({ invoiceId: '', amount: '' })
+        setFormData({ invoiceId: '', amount: '', currency: 'NGN' })
         fetchReceipts()
         fetchInvoices() // Refresh invoices to update status
       }
@@ -141,7 +146,7 @@ export default function ReceiptsPage() {
             </button>
             <button
               onClick={() => {
-                setFormData({ invoiceId: '', amount: '' })
+                setFormData({ invoiceId: '', amount: '', currency: 'NGN' })
                 setShowModal(true)
               }}
               className="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
@@ -201,7 +206,7 @@ export default function ReceiptsPage() {
                           {receipt.invoice.product?.name || 'N/A'}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">
-                          ${receipt.amount.toFixed(2)}
+                          {formatCurrency(receipt.amount, receipt.currency)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {new Date(receipt.createdAt).toLocaleDateString()}
@@ -267,7 +272,7 @@ export default function ReceiptsPage() {
                       </div>
                       
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">Payment Amount ($) *</label>
+                        <label className="block text-sm font-medium text-gray-700">Payment Amount *</label>
                         <input
                           type="number"
                           required
@@ -277,6 +282,15 @@ export default function ReceiptsPage() {
                           onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
                           className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                           placeholder="0.00"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Currency *</label>
+                        <CurrencySelector
+                          value={formData.currency}
+                          onChange={(currency) => setFormData({ ...formData, currency })}
+                          className="mt-1 block w-full"
                         />
                       </div>
                     </div>

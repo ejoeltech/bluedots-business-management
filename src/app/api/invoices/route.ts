@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { customerId, productId, quantity, total, status } = body
+    const { customerId, productId, quantity, total, currency, status } = body
 
     if (!customerId || !productId || !quantity || total === undefined) {
       return NextResponse.json({ error: 'Required fields missing' }, { status: 400 })
@@ -58,6 +58,7 @@ export async function POST(request: NextRequest) {
         productId: parseInt(productId),
         quantity: parseInt(quantity),
         total: parseFloat(total),
+        currency: currency || 'NGN',
         status: status || 'unpaid',
         userId: parseInt(session.user.id)
       },

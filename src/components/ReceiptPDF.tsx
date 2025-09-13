@@ -3,10 +3,12 @@
 import { useEffect, useRef } from 'react'
 import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
+import { formatCurrency } from '@/lib/currency'
 
 interface Receipt {
   id: number
   amount: number
+  currency: string
   createdAt: string
   invoice: {
     id: number
@@ -19,9 +21,11 @@ interface Receipt {
     product?: {
       name: string
       price: number
+      currency: string
     }
     quantity: number
     total: number
+    currency: string
     createdAt: string
   }
 }
@@ -144,7 +148,7 @@ export default function ReceiptPDF({
               <div className="text-4xl font-bold text-green-600 mb-2">✓ PAID</div>
               <p className="text-lg text-green-800">Payment Received</p>
               <p className="text-2xl font-bold text-green-900 mt-2">
-                ${receipt.amount.toFixed(2)}
+                {formatCurrency(receipt.amount, receipt.currency)}
               </p>
             </div>
           </div>
@@ -207,17 +211,17 @@ export default function ReceiptPDF({
           <div className="w-64">
             <div className="flex justify-between py-2 border-b border-gray-300">
               <span className="text-sm font-medium text-gray-900">Invoice Total:</span>
-              <span className="text-sm text-gray-900">${receipt.invoice.total.toFixed(2)}</span>
+              <span className="text-sm text-gray-900">{formatCurrency(receipt.invoice.total, receipt.invoice.currency)}</span>
             </div>
             <div className="flex justify-between py-4">
               <span className="text-lg font-bold text-gray-900">Amount Paid:</span>
-              <span className="text-lg font-bold text-green-600">${receipt.amount.toFixed(2)}</span>
+              <span className="text-lg font-bold text-green-600">{formatCurrency(receipt.amount, receipt.currency)}</span>
             </div>
             {receipt.amount < receipt.invoice.total && (
               <div className="flex justify-between py-2">
                 <span className="text-sm font-medium text-red-600">Outstanding:</span>
                 <span className="text-sm font-bold text-red-600">
-                  ${(receipt.invoice.total - receipt.amount).toFixed(2)}
+                  {formatCurrency(receipt.invoice.total - receipt.amount, receipt.currency)}
                 </span>
               </div>
             )}

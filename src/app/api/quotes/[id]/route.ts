@@ -42,7 +42,7 @@ export async function PUT(
     }
 
     const body = await request.json()
-    const { total, status } = body
+    const { total, currency, status } = body
 
     if (total === undefined) {
       return NextResponse.json({ error: 'Total is required' }, { status: 400 })
@@ -52,6 +52,7 @@ export async function PUT(
       where: { id: parseInt((await params).id) },
       data: {
         total: parseFloat(total),
+        currency: currency || 'NGN',
         status: status || 'pending'
       },
       include: {

@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { invoiceId, amount } = body
+    const { invoiceId, amount, currency } = body
 
     if (!invoiceId || amount === undefined) {
       return NextResponse.json({ error: 'Invoice ID and amount are required' }, { status: 400 })
@@ -50,6 +50,7 @@ export async function POST(request: NextRequest) {
       data: {
         invoiceId: parseInt(invoiceId),
         amount: parseFloat(amount),
+        currency: currency || 'NGN',
         userId: parseInt(session.user.id)
       },
       include: {

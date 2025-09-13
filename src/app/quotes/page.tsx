@@ -3,7 +3,9 @@
 import { useState, useEffect } from 'react'
 import Layout from '@/components/Layout'
 import QuotePDF from '@/components/QuotePDF'
+import CurrencySelector from '@/components/CurrencySelector'
 import { Plus, Edit, Trash2, Eye, Download, FileText } from 'lucide-react'
+import { formatCurrency } from '@/lib/currency'
 
 interface Quote {
   id: number
@@ -12,6 +14,7 @@ interface Quote {
     email?: string
   }
   total: number
+  currency: string
   status: string
   createdAt: string
 }
@@ -26,6 +29,7 @@ export default function QuotesPage() {
   const [formData, setFormData] = useState({
     customerId: '',
     total: '',
+    currency: 'NGN',
     status: 'pending'
   })
   const [customers, setCustomers] = useState<any[]>([])
@@ -78,7 +82,7 @@ export default function QuotesPage() {
       if (response.ok) {
         setShowModal(false)
         setEditingQuote(null)
-        setFormData({ customerId: '', total: '', status: 'pending' })
+        setFormData({ customerId: '', total: '', currency: 'NGN', status: 'pending' })
         fetchQuotes()
       }
     } catch (error) {
@@ -170,7 +174,7 @@ export default function QuotesPage() {
             <button
               onClick={() => {
                 setEditingQuote(null)
-                setFormData({ customerId: '', total: '', status: 'pending' })
+                setFormData({ customerId: '', total: '', currency: 'NGN', status: 'pending' })
                 setShowModal(true)
               }}
               className="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
@@ -221,7 +225,7 @@ export default function QuotesPage() {
                           <div className="text-sm text-gray-500">{quote.customer.email}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          ${quote.total.toFixed(2)}
+                          {formatCurrency(quote.total, quote.currency)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <select
@@ -308,7 +312,7 @@ export default function QuotesPage() {
                       </div>
                       
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">Total Amount ($) *</label>
+                        <label className="block text-sm font-medium text-gray-700">Total Amount *</label>
                         <input
                           type="number"
                           required
@@ -318,6 +322,15 @@ export default function QuotesPage() {
                           onChange={(e) => setFormData({ ...formData, total: e.target.value })}
                           className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                           placeholder="0.00"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Currency *</label>
+                        <CurrencySelector
+                          value={formData.currency}
+                          onChange={(currency) => setFormData({ ...formData, currency })}
+                          className="mt-1 block w-full"
                         />
                       </div>
                       

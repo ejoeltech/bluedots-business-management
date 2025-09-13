@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { customerId, total, status } = body
+    const { customerId, total, currency, status } = body
 
     if (!customerId || total === undefined) {
       return NextResponse.json({ error: 'Customer ID and total are required' }, { status: 400 })
@@ -44,6 +44,7 @@ export async function POST(request: NextRequest) {
       data: {
         customerId: parseInt(customerId),
         total: parseFloat(total),
+        currency: currency || 'NGN',
         status: status || 'pending',
         userId: parseInt(session.user.id)
       },

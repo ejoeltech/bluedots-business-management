@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react'
 import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
+import { formatCurrency } from '@/lib/currency'
 
 interface Quote {
   id: number
@@ -13,6 +14,7 @@ interface Quote {
     address?: string
   }
   total: number
+  currency: string
   status: string
   createdAt: string
 }
@@ -185,10 +187,10 @@ export default function QuotePDF({
                   1
                 </td>
                 <td className="border border-gray-300 px-4 py-2 text-right text-sm text-gray-900">
-                  ${quote.total.toFixed(2)}
+                  {formatCurrency(quote.total, quote.currency)}
                 </td>
                 <td className="border border-gray-300 px-4 py-2 text-right text-sm text-gray-900">
-                  ${quote.total.toFixed(2)}
+                  {formatCurrency(quote.total, quote.currency)}
                 </td>
               </tr>
             </tbody>
@@ -200,15 +202,15 @@ export default function QuotePDF({
           <div className="w-64">
             <div className="flex justify-between py-2 border-b border-gray-300">
               <span className="text-sm font-medium text-gray-900">Subtotal:</span>
-              <span className="text-sm text-gray-900">${quote.total.toFixed(2)}</span>
+              <span className="text-sm text-gray-900">{formatCurrency(quote.total, quote.currency)}</span>
             </div>
             <div className="flex justify-between py-2 border-b border-gray-300">
               <span className="text-sm font-medium text-gray-900">Tax:</span>
-              <span className="text-sm text-gray-900">$0.00</span>
+              <span className="text-sm text-gray-900">{formatCurrency(0, quote.currency)}</span>
             </div>
             <div className="flex justify-between py-4">
               <span className="text-lg font-bold text-gray-900">Total:</span>
-              <span className="text-lg font-bold text-gray-900">${quote.total.toFixed(2)}</span>
+              <span className="text-lg font-bold text-gray-900">{formatCurrency(quote.total, quote.currency)}</span>
             </div>
           </div>
         </div>
