@@ -14,7 +14,7 @@ export async function ensureDatabaseInitialized() {
     if (result.success) {
       isInitialized = true
       console.log('✅ Database initialization completed successfully')
-      return { success: true, ...result }
+      return { ...result, alreadyInitialized: false }
     } else {
       console.error('❌ Database initialization failed:', result.error)
       return result
