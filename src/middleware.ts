@@ -3,7 +3,12 @@ import type { NextRequest } from 'next/server'
 import { authRateLimit, apiRateLimit } from '@/lib/rate-limit'
 
 export function middleware(request: NextRequest) {
-  // Rate limiting for authentication endpoints
+  // Skip rate limiting for development or if explicitly disabled
+  if (process.env.NODE_ENV === 'development' || process.env.DISABLE_RATE_LIMITING === 'true') {
+    return NextResponse.next()
+  }
+
+  // Rate limiting for authentication endpoints - more lenient
   if (request.nextUrl.pathname.startsWith('/api/auth/')) {
     const rateLimitResult = authRateLimit(request)
     

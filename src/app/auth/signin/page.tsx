@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { signIn, getSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -18,14 +18,36 @@ export default function SignInPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const router = useRouter()
+  const searchParams = useSearchParams()
 
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<SignInForm>({
     resolver: zodResolver(signInSchema),
   })
+
+  // Remove any sensitive data from URL parameters for security
+  useEffect(() => {
+    const email = searchParams.get('email')
+    const password = searchParams.get('password')
+    
+    if (email) {
+      setValue('email', email)
+    }
+    
+    // NEVER set password from URL - this is a security vulnerability
+    if (password) {
+      console.warn('SECURITY WARNING: Password detected in URL parameters. This is a security risk.')
+      // Clear the URL without reloading the page
+      const url = new URL(window.location.href)
+      url.searchParams.delete('password')
+      url.searchParams.delete('email')
+      window.history.replaceState({}, '', url.toString())
+    }
+  }, [searchParams, setValue])
 
   const onSubmit = async (data: SignInForm) => {
     setIsLoading(true)

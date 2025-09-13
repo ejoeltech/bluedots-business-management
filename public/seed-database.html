@@ -164,10 +164,10 @@
                         <p><strong>Database Setup:</strong> ${setupData.schemaCreated ? 'Schema created and ' : 'Existing schema '}data seeded successfully</p>
                         <p><strong>Created:</strong></p>
                         <ul>
-                            <li>${data.data.users.length} users</li>
-                            <li>${data.data.products.length} products</li>
-                            <li>${data.data.sampleData.customers} sample customer</li>
-                            <li>${data.data.sampleData.reminders} sample reminder</li>
+                            <li>${data.data?.users?.length || data.users || 0} users</li>
+                            <li>${data.data?.products?.length || data.products || 0} products</li>
+                            <li>${data.data?.sampleData?.customers || data.sampleData?.customers || 0} sample customers</li>
+                            <li>${data.data?.sampleData?.reminders || data.sampleData?.reminders || 0} sample reminders</li>
                         </ul>
                         <p><strong>🎉 You can now log in with the credentials shown above!</strong></p>
                     `;

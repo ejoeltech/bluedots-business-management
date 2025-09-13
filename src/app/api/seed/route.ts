@@ -18,8 +18,18 @@ export async function POST() {
     
     console.log('✅ Database schema ready, checking for existing data...')
     
-    // Check if users already exist
-    const existingUsers = await prisma.user.findMany()
+    // Check if users already exist with proper error handling
+    let existingUsers = []
+    try {
+      existingUsers = await prisma.user.findMany()
+    } catch (error) {
+      console.error('Error checking existing users:', error)
+      return NextResponse.json({ 
+        error: 'Database connection failed',
+        details: 'Unable to connect to database. Please ensure the database is properly configured.'
+      }, { status: 500 })
+    }
+    
     if (existingUsers.length > 0) {
       return NextResponse.json({ 
         message: 'Database already seeded',
