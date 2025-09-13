@@ -130,6 +130,7 @@ model ReminderTemplate {
   userId                Int?
   user                  User?     @relation(fields: [userId], references: [id])
   reminders             Reminder[]
+  communications        ReminderCommunication[]
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
 }
