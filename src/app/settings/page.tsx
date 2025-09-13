@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react'
 import Layout from '@/components/Layout'
 import ConfigurationBackup from '@/components/ConfigurationBackup'
 import AppUpdateExport from '@/components/AppUpdateExport'
-import { Settings, User, Bell, Building, Palette, Database, Download } from 'lucide-react'
+import EmailSettings from '@/components/EmailSettings'
+import { Settings, User, Bell, Building, Palette, Database, Download, Mail } from 'lucide-react'
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState('company')
@@ -28,6 +29,7 @@ export default function SettingsPage() {
   const tabs = [
     { id: 'company', name: 'Company Info', icon: Building },
     { id: 'reminders', name: 'Reminders', icon: Bell },
+    { id: 'email', name: 'Email Settings', icon: Mail },
     { id: 'appearance', name: 'Appearance', icon: Palette },
     { id: 'backup', name: 'Backup & Restore', icon: Download },
     { id: 'app-update', name: 'App Update', icon: Database },
@@ -227,6 +229,13 @@ export default function SettingsPage() {
                   </div>
                 </div>
               </form>
+            )}
+
+            {/* Email Settings */}
+            {activeTab === 'email' && (
+              <div className="bg-white shadow px-4 py-5 sm:rounded-lg sm:p-6">
+                <EmailSettings />
+              </div>
             )}
 
             {/* Appearance Settings */}

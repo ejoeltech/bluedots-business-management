@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { emailService } from '@/lib/email'
 
 export async function GET() {
   try {
@@ -67,6 +68,24 @@ export async function POST(request: NextRequest) {
         product: true
       }
     })
+
+    // Send email notification to customer if email is available
+    if (invoice.customer.email) {
+      try {
+        const template = emailService.generateInvoiceNotificationTemplate(
+          invoice.customer.name,
+          invoice.id,
+          invoice.total,
+          invoice.currency || 'NGN'
+        )
+        
+        await emailService.sendEmail(invoice.customer.email, template)
+        console.log(`Invoice notification sent to ${invoice.customer.name} (${invoice.customer.email})`)
+      } catch (error) {
+        console.error('Failed to send invoice notification:', error)
+        // Don't fail the invoice creation if email fails
+      }
+    }
 
     return NextResponse.json(invoice, { status: 201 })
   } catch (error) {

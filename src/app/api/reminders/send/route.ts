@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { emailService } from '@/lib/email'
 
 export async function POST() {
   try {
@@ -25,34 +26,71 @@ export async function POST() {
       }
     })
 
-    // In a real application, you would send emails here
-    // For now, we'll just log the reminders and update their next due date
+    // Send email reminders and update their next due date
     const sentReminders = []
+    const failedReminders = []
 
     for (const reminder of dueReminders) {
-      // Calculate next due date
-      const nextDue = new Date(reminder.nextDue)
-      nextDue.setDate(nextDue.getDate() + reminder.interval)
+      try {
+        // Calculate next due date
+        const nextDue = new Date(reminder.nextDue)
+        nextDue.setDate(nextDue.getDate() + reminder.interval)
 
-      // Update reminder with new due date
-      await prisma.reminder.update({
-        where: { id: reminder.id },
-        data: { nextDue }
-      })
+        // Send email if customer has email address
+        if (reminder.customer.email) {
+          const template = emailService.generateReminderTemplate(
+            reminder.customer.name,
+            reminder.product,
+            nextDue
+          )
+          
+          const emailSent = await emailService.sendEmail(reminder.customer.email, template)
+          
+          if (emailSent) {
+            console.log(`Email reminder sent to ${reminder.customer.name} (${reminder.customer.email})`)
+          } else {
+            console.log(`Failed to send email to ${reminder.customer.name} (${reminder.customer.email})`)
+            failedReminders.push({
+              id: reminder.id,
+              customer: reminder.customer.name,
+              email: reminder.customer.email,
+              product: reminder.product
+            })
+          }
+        } else {
+          console.log(`No email address for customer ${reminder.customer.name}`)
+        }
 
-      sentReminders.push({
-        id: reminder.id,
-        customer: reminder.customer.name,
-        product: reminder.product,
-        nextDue: nextDue.toISOString()
-      })
+        // Update reminder with new due date
+        await prisma.reminder.update({
+          where: { id: reminder.id },
+          data: { nextDue }
+        })
 
-      console.log(`Reminder sent for ${reminder.customer.name} - ${reminder.product}`)
+        sentReminders.push({
+          id: reminder.id,
+          customer: reminder.customer.name,
+          email: reminder.customer.email,
+          product: reminder.product,
+          nextDue: nextDue.toISOString()
+        })
+
+      } catch (error) {
+        console.error(`Error processing reminder ${reminder.id}:`, error)
+        failedReminders.push({
+          id: reminder.id,
+          customer: reminder.customer.name,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        })
+      }
     }
 
     return NextResponse.json({
-      message: `${sentReminders.length} reminders processed`,
-      reminders: sentReminders
+      message: `${sentReminders.length} reminders processed successfully`,
+      sent: sentReminders.length,
+      failed: failedReminders.length,
+      reminders: sentReminders,
+      errors: failedReminders
     })
   } catch (error) {
     console.error('Error sending reminders:', error)

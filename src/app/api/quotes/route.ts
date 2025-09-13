@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { emailService } from '@/lib/email'
 
 export async function GET() {
   try {
@@ -52,6 +53,24 @@ export async function POST(request: NextRequest) {
         customer: true
       }
     })
+
+    // Send email notification to customer if email is available
+    if (quote.customer.email) {
+      try {
+        const template = emailService.generateQuoteNotificationTemplate(
+          quote.customer.name,
+          quote.id,
+          quote.total,
+          quote.currency || 'NGN'
+        )
+        
+        await emailService.sendEmail(quote.customer.email, template)
+        console.log(`Quote notification sent to ${quote.customer.name} (${quote.customer.email})`)
+      } catch (error) {
+        console.error('Failed to send quote notification:', error)
+        // Don't fail the quote creation if email fails
+      }
+    }
 
     return NextResponse.json(quote, { status: 201 })
   } catch (error) {
