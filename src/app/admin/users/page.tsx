@@ -54,7 +54,7 @@ export default function UsersPage() {
       const method = editingUser ? 'PUT' : 'POST'
       
       // Don't send password if editing and password is empty
-      const submitData = { ...formData }
+      const submitData: any = { ...formData }
       if (editingUser && !submitData.password) {
         delete submitData.password
       }
