@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
             id: reminder.customer.id,
             name: reminder.customer.name,
             email: reminder.customer.email || '',
-            phone: reminder.customer.phone
+            phone: reminder.customer.phone || undefined
           },
           reminder: {
             id: reminder.id,
