@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Seeder - Bluedots Technologies</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #4F46E5;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .button {
+            background: #4F46E5;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 0;
+            width: 100%;
+        }
+        .button:hover {
+            background: #3730A3;
+        }
+        .button:disabled {
+            background: #9CA3AF;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 6px;
+            display: none;
+        }
+        .success {
+            background: #D1FAE5;
+            color: #065F46;
+            border: 1px solid #A7F3D0;
+        }
+        .error {
+            background: #FEE2E2;
+            color: #991B1B;
+            border: 1px solid #FECACA;
+        }
+        .info {
+            background: #EFF6FF;
+            color: #1E40AF;
+            border: 1px solid #BFDBFE;
+            margin-bottom: 20px;
+        }
+        .credentials {
+            background: #FEF3C7;
+            color: #92400E;
+            border: 1px solid #FDE68A;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+        }
+        .credentials h3 {
+            margin-top: 0;
+        }
+        .credentials ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗄️ Database Seeder</h1>
+        
+        <div class="info">
+            <strong>Purpose:</strong> This tool will set up your database with default users and sample data for the Bluedots Technologies Business Management System.
+        </div>
+
+        <button id="seedBtn" class="button" onclick="seedDatabase()">
+            🌱 Seed Database
+        </button>
+
+        <div id="result" class="result"></div>
+
+        <div class="credentials">
+            <h3>🔐 Default Login Credentials</h3>
+            <p>After seeding, you can log in with these credentials:</p>
+            <ul>
+                <li><strong>Admin:</strong> admin@bluedots.com / admin123</li>
+                <li><strong>Manager:</strong> manager@bluedots.com / manager123</li>
+                <li><strong>User:</strong> user@bluedots.com / user123</li>
+            </ul>
+        </div>
+
+        <div style="margin-top: 30px; text-align: center;">
+            <a href="/auth/signin" style="color: #4F46E5; text-decoration: none;">
+                ← Back to Login
+            </a>
+        </div>
+    </div>
+
+    <script>
+        async function seedDatabase() {
+            const btn = document.getElementById('seedBtn');
+            const result = document.getElementById('result');
+            
+            btn.disabled = true;
+            btn.textContent = '⏳ Seeding Database...';
+            result.style.display = 'none';
+
+            try {
+                const response = await fetch('/api/seed', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    result.className = 'result success';
+                    result.innerHTML = `
+                        <h3>✅ ${data.message}</h3>
+                        <p><strong>Created:</strong></p>
+                        <ul>
+                            <li>${data.data.users.length} users</li>
+                            <li>${data.data.products.length} products</li>
+                            <li>${data.data.sampleData.customers} sample customer</li>
+                            <li>${data.data.sampleData.reminders} sample reminder</li>
+                        </ul>
+                        <p><strong>You can now log in with the credentials shown above!</strong></p>
+                    `;
+                } else {
+                    result.className = 'result error';
+                    result.innerHTML = `
+                        <h3>❌ Error</h3>
+                        <p><strong>Message:</strong> ${data.error || 'Unknown error'}</p>
+                        ${data.details ? `<p><strong>Details:</strong> ${data.details}</p>` : ''}
+                    `;
+                }
+            } catch (error) {
+                result.className = 'result error';
+                result.innerHTML = `
+                    <h3>❌ Network Error</h3>
+                    <p>Failed to connect to the seeding API. Please try again.</p>
+                    <p><strong>Error:</strong> ${error.message}</p>
+                `;
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '🌱 Seed Database';
+                result.style.display = 'block';
+            }
+        }
+
+        // Auto-check if database is already seeded
+        window.onload = async function() {
+            try {
+                const response = await fetch('/api/seed', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.message === 'Database already seeded') {
+                    const result = document.getElementById('result');
+                    result.className = 'result success';
+                    result.innerHTML = `
+                        <h3>✅ Database Already Seeded</h3>
+                        <p>The database already contains ${data.users} user(s).</p>
+                        <p><strong>You can log in with the credentials shown above!</strong></p>
+                    `;
+                    result.style.display = 'block';
+                    
+                    document.getElementById('seedBtn').textContent = '🔄 Re-seed Database';
+                }
+            } catch (error) {
+                // Silently fail - user can still try to seed
+            }
+        };
+    </script>
+</body>
+</html>
