@@ -117,20 +117,31 @@
             const result = document.getElementById('result');
             
             btn.disabled = true;
-            btn.textContent = '⏳ Seeding Database...';
+            btn.textContent = '⏳ Setting up database...';
             result.style.display = 'none';
 
             try {
-                const response = await fetch('/api/seed', {
+                // First, try to setup the database schema
+                btn.textContent = '⏳ Setting up database schema...';
+                const setupResponse = await fetch('/api/setup-database', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     }
                 });
 
-                const data = await response.json();
+                // Now try to seed the database
+                btn.textContent = '⏳ Seeding Database...';
+                const seedResponse = await fetch('/api/seed', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
 
-                if (response.ok) {
+                const data = await seedResponse.json();
+
+                if (seedResponse.ok) {
                     result.className = 'result success';
                     result.innerHTML = `
                         <h3>✅ ${data.message}</h3>
@@ -149,6 +160,7 @@
                         <h3>❌ Error</h3>
                         <p><strong>Message:</strong> ${data.error || 'Unknown error'}</p>
                         ${data.details ? `<p><strong>Details:</strong> ${data.details}</p>` : ''}
+                        <p><strong>Note:</strong> The database schema may not exist. This usually means the build process didn't run the database migration properly.</p>
                     `;
                 }
             } catch (error) {
