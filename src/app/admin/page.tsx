@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import Layout from '@/components/Layout'
 import ConfigurationBackup from '@/components/ConfigurationBackup'
 import AppUpdateExport from '@/components/AppUpdateExport'
-import { Shield, Database, Download, AlertTriangle } from 'lucide-react'
+import { Shield, Database, Download, AlertTriangle, Users } from 'lucide-react'
 
 export default function AdminPage() {
   const { data: session, status } = useSession()
@@ -38,6 +38,7 @@ export default function AdminPage() {
 
   const tabs = [
     { id: 'overview', name: 'Overview', icon: Shield },
+    { id: 'user-management', name: 'User Management', icon: Users },
     { id: 'config-backup', name: 'Configuration Backup', icon: Download },
     { id: 'app-update', name: 'App Update', icon: Database }
   ]
@@ -141,6 +142,37 @@ export default function AdminPage() {
                     </ul>
                   </div>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'user-management' && (
+            <div className="bg-white shadow rounded-lg p-6">
+              <div className="mb-4">
+                <h3 className="text-lg leading-6 font-medium text-gray-900 mb-2">User Management</h3>
+                <p className="text-sm text-gray-600">
+                  Manage system users, roles, and permissions. Create new users with strong password requirements.
+                </p>
+              </div>
+              
+              <div className="mb-6">
+                <a
+                  href="/admin/users"
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                >
+                  <Users className="h-4 w-4 mr-2" />
+                  Manage Users
+                </a>
+              </div>
+
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h4 className="text-sm font-medium text-blue-900 mb-2">Security Features:</h4>
+                <ul className="text-sm text-blue-700 space-y-1 list-disc list-inside">
+                  <li>Password strength validation with visual indicators</li>
+                  <li>Role-based access control (Admin, Manager, User)</li>
+                  <li>Secure password hashing with bcrypt</li>
+                  <li>User activity tracking and audit logs</li>
+                </ul>
               </div>
             </div>
           )}

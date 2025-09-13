@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Layout from '@/components/Layout'
+import DashboardCharts from '@/components/DashboardCharts'
 import { Users, FileText, Receipt, Package, Bell, TrendingUp, DollarSign } from 'lucide-react'
 
 interface DashboardStats {
@@ -275,6 +276,11 @@ export default function DashboardPage() {
               </a>
             </div>
           </div>
+        </div>
+
+        {/* Enhanced Analytics Dashboard */}
+        <div className="mt-8">
+          <DashboardCharts />
         </div>
       </div>
     </Layout>
