@@ -144,7 +144,7 @@ export async function GET(request: NextRequest) {
       })
     ])
 
-    const activities = []
+    const activities: Array<{ type: string; description: string; date: string }> = []
     
     // Process invoices
     recentActivity[0].forEach(invoice => {
