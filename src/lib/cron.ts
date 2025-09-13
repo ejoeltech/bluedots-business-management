@@ -23,7 +23,6 @@ export function setupReminderCron() {
       console.error('Error in reminder cron job:', error)
     }
   }, {
-    scheduled: true,
     timezone: "America/New_York"
   })
   
@@ -53,7 +52,6 @@ export function setupTestReminderCron() {
       console.error('Error in test reminder cron job:', error)
     }
   }, {
-    scheduled: true,
     timezone: "America/New_York"
   })
   
