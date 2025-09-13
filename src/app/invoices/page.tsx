@@ -52,10 +52,16 @@ export default function InvoicesPage() {
   const fetchInvoices = async () => {
     try {
       const response = await fetch('/api/invoices')
-      const data = await response.json()
-      setInvoices(data)
+      if (response.ok) {
+        const data = await response.json()
+        setInvoices(Array.isArray(data) ? data : [])
+      } else {
+        console.error('Failed to fetch invoices:', response.status)
+        setInvoices([])
+      }
     } catch (error) {
       console.error('Error fetching invoices:', error)
+      setInvoices([])
     } finally {
       setLoading(false)
     }
@@ -64,20 +70,32 @@ export default function InvoicesPage() {
   const fetchCustomers = async () => {
     try {
       const response = await fetch('/api/customers')
-      const data = await response.json()
-      setCustomers(data)
+      if (response.ok) {
+        const data = await response.json()
+        setCustomers(Array.isArray(data) ? data : [])
+      } else {
+        console.error('Failed to fetch customers:', response.status)
+        setCustomers([])
+      }
     } catch (error) {
       console.error('Error fetching customers:', error)
+      setCustomers([])
     }
   }
 
   const fetchProducts = async () => {
     try {
       const response = await fetch('/api/products')
-      const data = await response.json()
-      setProducts(data)
+      if (response.ok) {
+        const data = await response.json()
+        setProducts(Array.isArray(data) ? data : [])
+      } else {
+        console.error('Failed to fetch products:', response.status)
+        setProducts([])
+      }
     } catch (error) {
       console.error('Error fetching products:', error)
+      setProducts([])
     }
   }
 
@@ -240,7 +258,8 @@ export default function InvoicesPage() {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {invoices.map((invoice) => (
+                    {invoices && Array.isArray(invoices) && invoices.length > 0 ? (
+                      invoices.map((invoice) => (
                       <tr key={invoice.id}>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                           #{invoice.id}
@@ -295,7 +314,18 @@ export default function InvoicesPage() {
                           </div>
                         </td>
                       </tr>
-                    ))}
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
+                          <div className="flex flex-col items-center">
+                            <Receipt className="h-12 w-12 text-gray-300 mb-4" />
+                            <h3 className="text-lg font-medium text-gray-900 mb-2">No invoices found</h3>
+                            <p className="text-gray-500">Get started by creating your first invoice.</p>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
               </div>

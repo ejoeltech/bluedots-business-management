@@ -42,10 +42,16 @@ export default function QuotesPage() {
   const fetchQuotes = async () => {
     try {
       const response = await fetch('/api/quotes')
-      const data = await response.json()
-      setQuotes(data)
+      if (response.ok) {
+        const data = await response.json()
+        setQuotes(Array.isArray(data) ? data : [])
+      } else {
+        console.error('Failed to fetch quotes:', response.status)
+        setQuotes([])
+      }
     } catch (error) {
       console.error('Error fetching quotes:', error)
+      setQuotes([])
     } finally {
       setLoading(false)
     }
@@ -54,10 +60,16 @@ export default function QuotesPage() {
   const fetchCustomers = async () => {
     try {
       const response = await fetch('/api/customers')
-      const data = await response.json()
-      setCustomers(data)
+      if (response.ok) {
+        const data = await response.json()
+        setCustomers(Array.isArray(data) ? data : [])
+      } else {
+        console.error('Failed to fetch customers:', response.status)
+        setCustomers([])
+      }
     } catch (error) {
       console.error('Error fetching customers:', error)
+      setCustomers([])
     }
   }
 
@@ -214,7 +226,8 @@ export default function QuotesPage() {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {quotes.map((quote) => (
+                    {quotes && Array.isArray(quotes) && quotes.length > 0 ? (
+                      quotes.map((quote) => (
                       <tr key={quote.id}>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                           #{quote.id}
@@ -271,7 +284,18 @@ export default function QuotesPage() {
                           </div>
                         </td>
                       </tr>
-                    ))}
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+                          <div className="flex flex-col items-center">
+                            <FileText className="h-12 w-12 text-gray-300 mb-4" />
+                            <h3 className="text-lg font-medium text-gray-900 mb-2">No quotes found</h3>
+                            <p className="text-gray-500">Get started by creating your first quote.</p>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
               </div>

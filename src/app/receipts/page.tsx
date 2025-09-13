@@ -49,10 +49,16 @@ export default function ReceiptsPage() {
   const fetchReceipts = async () => {
     try {
       const response = await fetch('/api/receipts')
-      const data = await response.json()
-      setReceipts(data)
+      if (response.ok) {
+        const data = await response.json()
+        setReceipts(Array.isArray(data) ? data : [])
+      } else {
+        console.error('Failed to fetch receipts:', response.status)
+        setReceipts([])
+      }
     } catch (error) {
       console.error('Error fetching receipts:', error)
+      setReceipts([])
     } finally {
       setLoading(false)
     }
@@ -61,14 +67,20 @@ export default function ReceiptsPage() {
   const fetchInvoices = async () => {
     try {
       const response = await fetch('/api/invoices')
-      const data = await response.json()
-      // Filter to only show unpaid or partially paid invoices
-      const eligibleInvoices = data.filter((invoice: any) => 
-        invoice.status === 'unpaid' || invoice.status === 'pending'
-      )
-      setInvoices(eligibleInvoices)
+      if (response.ok) {
+        const data = await response.json()
+        // Filter to only show unpaid or partially paid invoices
+        const eligibleInvoices = Array.isArray(data) ? data.filter((invoice: any) => 
+          invoice.status === 'unpaid' || invoice.status === 'pending'
+        ) : []
+        setInvoices(eligibleInvoices)
+      } else {
+        console.error('Failed to fetch invoices:', response.status)
+        setInvoices([])
+      }
     } catch (error) {
       console.error('Error fetching invoices:', error)
+      setInvoices([])
     }
   }
 
@@ -188,7 +200,8 @@ export default function ReceiptsPage() {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {receipts.map((receipt) => (
+                    {receipts && Array.isArray(receipts) && receipts.length > 0 ? (
+                      receipts.map((receipt) => (
                       <tr key={receipt.id}>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                           #{receipt.id}
@@ -223,7 +236,18 @@ export default function ReceiptsPage() {
                           </button>
                         </td>
                       </tr>
-                    ))}
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
+                          <div className="flex flex-col items-center">
+                            <Receipt className="h-12 w-12 text-gray-300 mb-4" />
+                            <h3 className="text-lg font-medium text-gray-900 mb-2">No receipts found</h3>
+                            <p className="text-gray-500">Get started by recording your first payment.</p>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
               </div>
