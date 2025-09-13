@@ -8,17 +8,21 @@ datasource db {
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
-  name      String
-  email     String    @unique
-  password  String
-  role      Role      @default(USER)
-  customers Customer[]
-  quotes    Quote[]
-  invoices  Invoice[]
-  receipts  Receipt[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id                    Int                     @id @default(autoincrement())
+  name                  String
+  email                 String                  @unique
+  password              String
+  role                  Role                    @default(USER)
+  customers             Customer[]
+  quotes                Quote[]
+  invoices              Invoice[]
+  receipts              Receipt[]
+  reminders             Reminder[]
+  reminderTemplates     ReminderTemplate[]
+  reminderCommunications ReminderCommunication[]
+  notificationSettings  NotificationSettings?
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime                @updatedAt
 }
 
 model Customer {
@@ -91,18 +95,122 @@ model Receipt {
 }
 
 model Reminder {
-  id          Int       @id @default(autoincrement())
-  customerId  Int
-  customer    Customer  @relation(fields: [customerId], references: [id])
-  product     String
-  interval    Int       @default(90) // in days
-  nextDue     DateTime
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id                    Int       @id @default(autoincrement())
+  customerId            Int
+  customer              Customer  @relation(fields: [customerId], references: [id])
+  product               String
+  interval              Int       @default(90) // in days
+  nextDue               DateTime
+  status                ReminderStatus @default(ACTIVE)
+  priority              ReminderPriority @default(MEDIUM)
+  templateId            Int?
+  template              ReminderTemplate? @relation(fields: [templateId], references: [id])
+  lastSent              DateTime?
+  escalationLevel       Int       @default(0)
+  maxEscalationLevel    Int       @default(3)
+  autoEscalate          Boolean   @default(true)
+  notes                 String?
+  userId                Int?
+  user                  User?     @relation(fields: [userId], references: [id])
+  communications        ReminderCommunication[]
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+}
+
+model ReminderTemplate {
+  id                    Int       @id @default(autoincrement())
+  name                  String
+  subject               String
+  body                  String
+  type                  ReminderType @default(SERVICE)
+  priority              ReminderPriority @default(MEDIUM)
+  escalationLevel       Int       @default(0)
+  isDefault             Boolean   @default(false)
+  isActive              Boolean   @default(true)
+  userId                Int?
+  user                  User?     @relation(fields: [userId], references: [id])
+  reminders             Reminder[]
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+}
+
+model ReminderCommunication {
+  id                    Int       @id @default(autoincrement())
+  reminderId            Int
+  reminder              Reminder  @relation(fields: [reminderId], references: [id])
+  type                  CommunicationType
+  status                CommunicationStatus @default(PENDING)
+  sentAt                DateTime?
+  recipient             String    // email or phone
+  subject               String?
+  content               String
+  templateId            Int?
+  template              ReminderTemplate? @relation(fields: [templateId], references: [id])
+  errorMessage          String?
+  retryCount            Int       @default(0)
+  maxRetries            Int       @default(3)
+  userId                Int?
+  user                  User?     @relation(fields: [userId], references: [id])
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+}
+
+model NotificationSettings {
+  id                    Int       @id @default(autoincrement())
+  userId                Int       @unique
+  user                  User      @relation(fields: [userId], references: [id])
+  emailEnabled          Boolean   @default(true)
+  smsEnabled            Boolean   @default(false)
+  pushEnabled           Boolean   @default(true)
+  reminderAdvanceDays   Int       @default(7)
+  escalationEnabled     Boolean   @default(true)
+  autoEscalateDays      Int       @default(3)
+  quietHoursStart       String?   // HH:MM format
+  quietHoursEnd         String?   // HH:MM format
+  timezone              String    @default("Africa/Lagos")
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
 }
 
 enum Role {
   ADMIN
   MANAGER
   USER
+}
+
+enum ReminderStatus {
+  ACTIVE
+  PAUSED
+  COMPLETED
+  CANCELLED
+}
+
+enum ReminderPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum ReminderType {
+  SERVICE
+  PAYMENT
+  FOLLOW_UP
+  APPOINTMENT
+  MAINTENANCE
+}
+
+enum CommunicationType {
+  EMAIL
+  SMS
+  PUSH
+  CALL
+}
+
+enum CommunicationStatus {
+  PENDING
+  SENT
+  DELIVERED
+  FAILED
+  BOUNCED
 }

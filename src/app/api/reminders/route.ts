@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { SmartNotificationEngine } from '@/lib/smart-notifications'
 
 export async function GET() {
   try {
@@ -12,7 +13,12 @@ export async function GET() {
 
     const reminders = await prisma.reminder.findMany({
       include: {
-        customer: true
+        customer: true,
+        template: true,
+        communications: {
+          orderBy: { createdAt: 'desc' },
+          take: 5
+        }
       },
       orderBy: {
         nextDue: 'asc'
@@ -34,7 +40,17 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { customerId, product, interval, nextDue } = body
+    const { 
+      customerId, 
+      product, 
+      interval, 
+      nextDue, 
+      priority = 'MEDIUM',
+      templateId,
+      notes,
+      autoEscalate = true,
+      maxEscalationLevel = 3
+    } = body
 
     if (!customerId || !product || !interval || !nextDue) {
       return NextResponse.json({ error: 'All fields are required' }, { status: 400 })
@@ -45,7 +61,13 @@ export async function POST(request: NextRequest) {
         customerId: parseInt(customerId),
         product,
         interval: parseInt(interval),
-        nextDue: new Date(nextDue)
+        nextDue: new Date(nextDue),
+        priority,
+        templateId: templateId ? parseInt(templateId) : null,
+        notes,
+        autoEscalate,
+        maxEscalationLevel: parseInt(maxEscalationLevel),
+        userId: parseInt(session.user.id)
       },
       include: {
         customer: true
