@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Layout from '@/components/Layout'
 import ReceiptPDF from '@/components/ReceiptPDF'
 import CurrencySelector from '@/components/CurrencySelector'
-import { Plus, Edit, Trash2, Eye, Download, TrendingUp } from 'lucide-react'
+import { Plus, Edit, Trash2, Eye, Download, TrendingUp, Receipt as ReceiptIcon } from 'lucide-react'
 import { formatCurrency } from '@/lib/currency'
 
 interface Receipt {
@@ -241,7 +241,7 @@ export default function ReceiptsPage() {
                       <tr>
                         <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
                           <div className="flex flex-col items-center">
-                            <Receipt className="h-12 w-12 text-gray-300 mb-4" />
+                            <ReceiptIcon className="h-12 w-12 text-gray-300 mb-4" />
                             <h3 className="text-lg font-medium text-gray-900 mb-2">No receipts found</h3>
                             <p className="text-gray-500">Get started by recording your first payment.</p>
                           </div>
