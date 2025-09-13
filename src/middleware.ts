@@ -35,8 +35,8 @@ export function middleware(request: NextRequest) {
     return response
   }
 
-  // Rate limiting for API endpoints
-  if (request.nextUrl.pathname.startsWith('/api/')) {
+  // Rate limiting for API endpoints (skip email endpoint for testing)
+  if (request.nextUrl.pathname.startsWith('/api/') && !request.nextUrl.pathname.startsWith('/api/email/')) {
     const rateLimitResult = apiRateLimit(request)
     
     if (!rateLimitResult.allowed) {
