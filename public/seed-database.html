@@ -127,7 +127,7 @@
             try {
                 // First, try to setup the database schema
                 btn.textContent = '⏳ Creating database schema...';
-                const setupResponse = await fetch('/api/setup-database', {
+                const setupResponse = await fetch('/api/setup-database-complete', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
