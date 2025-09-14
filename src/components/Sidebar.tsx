@@ -16,7 +16,8 @@ import {
   X,
   LogOut,
   TrendingUp,
-  Shield
+  Shield,
+  Database
 } from 'lucide-react'
 
 const baseNavigation = [
@@ -37,7 +38,7 @@ export default function Sidebar() {
 
   // Add admin navigation if user is admin
   const navigation = session?.user?.role === 'ADMIN' 
-    ? [...baseNavigation, { name: 'Administration', href: '/admin', icon: Shield }]
+    ? [...baseNavigation, { name: 'Database Status', href: '/database-status', icon: Database }, { name: 'Administration', href: '/admin', icon: Shield }]
     : baseNavigation
 
   return (

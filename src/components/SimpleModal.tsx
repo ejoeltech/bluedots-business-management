@@ -31,8 +31,6 @@ export default function SimpleModal({ isOpen, onClose, title, children }: Simple
 
   if (!mounted || !isOpen) return null
 
-  console.log('SimpleModal rendering:', { mounted, isOpen, title })
-
   return createPortal(
     <div 
       style={{ 
