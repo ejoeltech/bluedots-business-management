@@ -39,10 +39,16 @@ export default function InventoryPage() {
   const fetchProducts = async () => {
     try {
       const response = await fetch('/api/products')
-      const data = await response.json()
-      setProducts(data)
+      if (response.ok) {
+        const data = await response.json()
+        setProducts(Array.isArray(data) ? data : [])
+      } else {
+        console.error('Failed to fetch products:', response.status)
+        setProducts([])
+      }
     } catch (error) {
       console.error('Error fetching products:', error)
+      setProducts([])
     } finally {
       setLoading(false)
     }

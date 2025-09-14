@@ -11,6 +11,9 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    // Test database connection first
+    await prisma.$connect()
+
     const invoices = await prisma.invoice.findMany({
       include: {
         customer: true,
@@ -25,7 +28,16 @@ export async function GET() {
     return NextResponse.json(invoices)
   } catch (error) {
     console.error('Error fetching invoices:', error)
+    
+    // If it's a database table error, return empty array instead of 500
+    if (error instanceof Error && error.message.includes('does not exist')) {
+      console.log('Invoices table does not exist, returning empty array')
+      return NextResponse.json([])
+    }
+    
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  } finally {
+    await prisma.$disconnect()
   }
 }
 

@@ -11,6 +11,9 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    // Test database connection first
+    await prisma.$connect()
+
     const quotes = await prisma.quote.findMany({
       include: {
         customer: true
@@ -23,7 +26,16 @@ export async function GET() {
     return NextResponse.json(quotes)
   } catch (error) {
     console.error('Error fetching quotes:', error)
+    
+    // If it's a database table error, return empty array instead of 500
+    if (error instanceof Error && error.message.includes('does not exist')) {
+      console.log('Quotes table does not exist, returning empty array')
+      return NextResponse.json([])
+    }
+    
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  } finally {
+    await prisma.$disconnect()
   }
 }
 
