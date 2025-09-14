@@ -29,7 +29,6 @@ interface Invoice {
 }
 
 function InvoicesPageContent() {
-  const searchParams = useSearchParams()
   const [invoices, setInvoices] = useState<Invoice[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -54,7 +53,8 @@ function InvoicesPageContent() {
 
   // Handle URL parameters to auto-open modal
   useEffect(() => {
-    const action = searchParams.get('action')
+    const urlParams = new URLSearchParams(window.location.search)
+    const action = urlParams.get('action')
     if (action === 'create') {
       setFormData({ customerId: '', productId: '', quantity: '', total: '', currency: 'NGN', status: 'unpaid' })
       setShowModal(true)
@@ -63,7 +63,7 @@ function InvoicesPageContent() {
       url.searchParams.delete('action')
       window.history.replaceState({}, '', url.toString())
     }
-  }, [searchParams])
+  }, [])
 
   const fetchInvoices = async () => {
     try {
@@ -511,9 +511,5 @@ function InvoicesPageContent() {
 }
 
 export default function InvoicesPage() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <InvoicesPageContent />
-    </Suspense>
-  )
+  return <InvoicesPageContent />
 }
