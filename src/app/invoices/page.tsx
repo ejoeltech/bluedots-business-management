@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Layout from '@/components/Layout'
-import Modal from '@/components/Modal'
+import SimpleModal from '@/components/SimpleModal'
 import InvoicePDF from '@/components/InvoicePDF'
 import CurrencySelector from '@/components/CurrencySelector'
 import { Plus, Edit, Trash2, Eye, Download, Receipt } from 'lucide-react'
@@ -212,6 +212,16 @@ function InvoicesPageContent() {
   return (
     <Layout>
       <div className="px-4 py-6 sm:px-0">
+        {/* Debug info */}
+        <div className="fixed top-0 left-0 bg-red-500 text-white p-2 z-[10000] text-xs">
+          Modal State: {showModal ? 'OPEN' : 'CLOSED'}
+        </div>
+        <button 
+          onClick={() => setShowModal(true)}
+          className="fixed top-10 left-0 bg-blue-500 text-white p-2 z-[10000] text-xs"
+        >
+          TEST MODAL
+        </button>
         <div className="sm:flex sm:items-center">
           <div className="sm:flex-auto">
             <h1 className="text-2xl font-semibold text-gray-900">Invoices</h1>
@@ -350,11 +360,10 @@ function InvoicesPageContent() {
         </div>
 
         {/* Create Invoice Modal */}
-        <Modal
+        <SimpleModal
           isOpen={showModal}
           onClose={() => setShowModal(false)}
           title="Create New Invoice"
-          size="lg"
         >
           <form onSubmit={handleSubmit}>
                     
@@ -471,7 +480,7 @@ function InvoicesPageContent() {
               </button>
             </div>
           </form>
-        </Modal>
+        </SimpleModal>
 
         {/* PDF Modal */}
         {showPDFModal && selectedInvoice && (
