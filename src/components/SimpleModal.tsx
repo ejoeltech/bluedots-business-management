@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 
 interface SimpleModalProps {
   isOpen: boolean
@@ -30,7 +31,7 @@ export default function SimpleModal({ isOpen, onClose, title, children }: Simple
 
   if (!mounted || !isOpen) return null
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-[9999] overflow-y-auto">
       <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
         {/* Background overlay */}
@@ -61,6 +62,7 @@ export default function SimpleModal({ isOpen, onClose, title, children }: Simple
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }

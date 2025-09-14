@@ -252,11 +252,10 @@ function CustomersPageContent() {
         </div>
 
         {/* Modal */}
-        <Modal
+        <SimpleModal
           isOpen={showModal}
           onClose={() => setShowModal(false)}
           title={editingCustomer ? 'Edit Customer' : 'Add New Customer'}
-          size="lg"
         >
           <form onSubmit={handleSubmit}>
                     
@@ -319,7 +318,7 @@ function CustomersPageContent() {
               </button>
             </div>
           </form>
-        </Modal>
+        </SimpleModal>
       </div>
     </Layout>
   )

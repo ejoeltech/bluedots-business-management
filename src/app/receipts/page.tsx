@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Layout from '@/components/Layout'
-import Modal from '@/components/Modal'
+import SimpleModal from '@/components/SimpleModal'
 import ReceiptPDF from '@/components/ReceiptPDF'
 import CurrencySelector from '@/components/CurrencySelector'
 import { Plus, Edit, Trash2, Eye, Download, TrendingUp, Receipt as ReceiptIcon } from 'lucide-react'
@@ -271,11 +271,10 @@ function ReceiptsPageContent() {
         </div>
 
         {/* Create Receipt Modal */}
-        <Modal
+        <SimpleModal
           isOpen={showModal}
           onClose={() => setShowModal(false)}
           title="Record Payment"
-          size="lg"
         >
           <form onSubmit={handleSubmit}>
                     
@@ -344,7 +343,7 @@ function ReceiptsPageContent() {
               </button>
             </div>
           </form>
-        </Modal>
+        </SimpleModal>
 
         {/* PDF Modal */}
         {showPDFModal && selectedReceipt && (

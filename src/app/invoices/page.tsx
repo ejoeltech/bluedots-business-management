@@ -212,16 +212,6 @@ function InvoicesPageContent() {
   return (
     <Layout>
       <div className="px-4 py-6 sm:px-0">
-        {/* Debug info */}
-        <div className="fixed top-0 left-0 bg-red-500 text-white p-2 z-[10000] text-xs">
-          Modal State: {showModal ? 'OPEN' : 'CLOSED'}
-        </div>
-        <button 
-          onClick={() => setShowModal(true)}
-          className="fixed top-10 left-0 bg-blue-500 text-white p-2 z-[10000] text-xs"
-        >
-          TEST MODAL
-        </button>
         <div className="sm:flex sm:items-center">
           <div className="sm:flex-auto">
             <h1 className="text-2xl font-semibold text-gray-900">Invoices</h1>

@@ -1,9 +1,8 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useState, useEffect } from 'react'
 import Layout from '@/components/Layout'
-import Modal from '@/components/Modal'
+import SimpleModal from '@/components/SimpleModal'
 import QuotePDF from '@/components/QuotePDF'
 import CurrencySelector from '@/components/CurrencySelector'
 import { Plus, Edit, Trash2, Eye, Download, FileText } from 'lucide-react'
@@ -22,7 +21,6 @@ interface Quote {
 }
 
 function QuotesPageContent() {
-  const searchParams = useSearchParams()
   const [quotes, setQuotes] = useState<Quote[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -44,7 +42,8 @@ function QuotesPageContent() {
 
   // Handle URL parameters to auto-open modal
   useEffect(() => {
-    const action = searchParams.get('action')
+    const urlParams = new URLSearchParams(window.location.search)
+    const action = urlParams.get('action')
     if (action === 'create') {
       setShowModal(true)
       // Clean up URL without reloading
@@ -52,7 +51,7 @@ function QuotesPageContent() {
       url.searchParams.delete('action')
       window.history.replaceState({}, '', url.toString())
     }
-  }, [searchParams])
+  }, [])
 
   const fetchQuotes = async () => {
     try {
@@ -319,11 +318,10 @@ function QuotesPageContent() {
         </div>
 
         {/* Create/Edit Quote Modal */}
-        <Modal
+        <SimpleModal
           isOpen={showModal}
           onClose={() => setShowModal(false)}
           title={editingQuote ? 'Edit Quote' : 'Create New Quote'}
-          size="lg"
         >
           <form onSubmit={handleSubmit}>
                     
@@ -398,7 +396,7 @@ function QuotesPageContent() {
               </button>
             </div>
           </form>
-        </Modal>
+        </SimpleModal>
 
         {/* PDF Modal */}
         {showPDFModal && selectedQuote && (
@@ -429,9 +427,5 @@ function QuotesPageContent() {
 }
 
 export default function QuotesPage() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <QuotesPageContent />
-    </Suspense>
-  )
+  return <QuotesPageContent />
 }
