@@ -12,37 +12,22 @@ export default function DatabaseSetupPage() {
     setStatus('🔄 Setting up database...')
     
     try {
-      // Step 1: Setup database schema
-      setStatus('📋 Creating database tables...')
-      const setupResponse = await fetch('/api/setup-database-complete', {
+      // Single API call to initialize everything
+      setStatus('🚀 Initializing database and creating sample data...')
+      const initResponse = await fetch('/api/init-db', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
       })
       
-      const setupData = await setupResponse.json()
+      const initData = await initResponse.json()
       
-      if (!setupResponse.ok) {
-        throw new Error(`Setup failed: ${setupData.error}`)
-      }
-      
-      setStatus('🌱 Seeding database with sample data...')
-      
-      // Step 2: Seed database
-      const seedResponse = await fetch('/api/seed', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-      })
-      
-      const seedData = await seedResponse.json()
-      
-      if (!seedResponse.ok) {
-        throw new Error(`Seeding failed: ${seedData.error}`)
+      if (!initResponse.ok) {
+        throw new Error(`Initialization failed: ${initData.error}`)
       }
       
       setStatus('✅ Database setup completed successfully!')
       setResults({
-        setup: setupData,
-        seed: seedData
+        initialization: initData
       })
       
     } catch (error) {

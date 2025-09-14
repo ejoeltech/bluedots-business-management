@@ -127,7 +127,7 @@
             try {
                 // First, try to setup the database schema
                 btn.textContent = '⏳ Creating database schema...';
-                const setupResponse = await fetch('/api/setup-database-complete', {
+                const setupResponse = await fetch('/api/init-db', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -147,31 +147,20 @@
                     btn.textContent = '✅ Schema exists! Seeding data...';
                 }
 
-                // Now try to seed the database
-                const seedResponse = await fetch('/api/seed', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
-                });
-
-                const data = await seedResponse.json();
-
-                if (seedResponse.ok) {
-                    result.className = 'result success';
-                    result.innerHTML = `
-                        <h3>✅ ${data.message}</h3>
-                        <p><strong>Database Setup:</strong> ${setupData.schemaCreated ? 'Schema created and ' : 'Existing schema '}data seeded successfully</p>
-                        <p><strong>Created:</strong></p>
-                        <ul>
-                            <li>${data.data?.users?.length || data.users || 0} users</li>
-                            <li>${data.data?.products?.length || data.products || 0} products</li>
-                            <li>${data.data?.sampleData?.customers || data.sampleData?.customers || 0} sample customers</li>
-                            <li>${data.data?.sampleData?.reminders || data.sampleData?.reminders || 0} sample reminders</li>
-                        </ul>
-                        <p><strong>🎉 You can now log in with the credentials shown above!</strong></p>
-                    `;
-                } else {
+                // Success - single API call handles everything
+                result.className = 'result success';
+                result.innerHTML = `
+                    <h3>✅ ${setupData.message}</h3>
+                    <p><strong>Database Setup:</strong> Database initialized successfully with sample data</p>
+                    <p><strong>Created:</strong></p>
+                    <ul>
+                        <li>${setupData.data?.users || 0} users</li>
+                        <li>${setupData.data?.customers || 0} customers</li>
+                        <li>${setupData.data?.products || 0} products</li>
+                        <li>Admin user: ${setupData.data?.adminUser || 'created'}</li>
+                    </ul>
+                    <p><strong>🎉 You can now log in with the credentials shown above!</strong></p>
+                `;
                     result.className = 'result error';
                     result.innerHTML = `
                         <h3>❌ Seeding Error</h3>
