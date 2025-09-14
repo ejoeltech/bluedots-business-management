@@ -228,6 +228,15 @@ function InvoicesPageContent() {
           </button>
           <button 
             onClick={() => {
+              // Test with a simple alert to verify button clicks work
+              alert('Button click working! Modal state: ' + showModal)
+            }}
+            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          >
+            Test Alert
+          </button>
+          <button 
+            onClick={() => {
               console.log('Button clicked, setting modal to false')
               setShowModal(false)
             }}
@@ -379,6 +388,10 @@ function InvoicesPageContent() {
           onClose={() => setShowModal(false)}
           title="Create New Invoice"
         >
+          <div style={{ padding: '10px', backgroundColor: 'lightblue', border: '2px solid red' }}>
+            <p><strong>TEST: Modal is visible!</strong></p>
+            <p>If you can see this, the modal is working.</p>
+          </div>
           <form onSubmit={handleSubmit}>
                     
                     <div className="space-y-4">
