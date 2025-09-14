@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Layout from '@/components/Layout'
 import InvoicePDF from '@/components/InvoicePDF'
 import CurrencySelector from '@/components/CurrencySelector'
@@ -26,7 +27,8 @@ interface Invoice {
   receipts: any[]
 }
 
-export default function InvoicesPage() {
+function InvoicesPageContent() {
+  const searchParams = useSearchParams()
   const [invoices, setInvoices] = useState<Invoice[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -48,6 +50,18 @@ export default function InvoicesPage() {
     fetchCustomers()
     fetchProducts()
   }, [])
+
+  // Handle URL parameters to auto-open modal
+  useEffect(() => {
+    const action = searchParams.get('action')
+    if (action === 'create') {
+      setShowModal(true)
+      // Clean up URL without reloading
+      const url = new URL(window.location.href)
+      url.searchParams.delete('action')
+      window.history.replaceState({}, '', url.toString())
+    }
+  }, [searchParams])
 
   const fetchInvoices = async () => {
     try {
@@ -492,5 +506,13 @@ export default function InvoicesPage() {
         )}
       </div>
     </Layout>
+  )
+}
+
+export default function InvoicesPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <InvoicesPageContent />
+    </Suspense>
   )
 }

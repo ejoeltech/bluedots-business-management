@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Layout from '@/components/Layout'
 import QuotePDF from '@/components/QuotePDF'
 import CurrencySelector from '@/components/CurrencySelector'
@@ -19,7 +20,8 @@ interface Quote {
   createdAt: string
 }
 
-export default function QuotesPage() {
+function QuotesPageContent() {
+  const searchParams = useSearchParams()
   const [quotes, setQuotes] = useState<Quote[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -38,6 +40,18 @@ export default function QuotesPage() {
     fetchQuotes()
     fetchCustomers()
   }, [])
+
+  // Handle URL parameters to auto-open modal
+  useEffect(() => {
+    const action = searchParams.get('action')
+    if (action === 'create') {
+      setShowModal(true)
+      // Clean up URL without reloading
+      const url = new URL(window.location.href)
+      url.searchParams.delete('action')
+      window.history.replaceState({}, '', url.toString())
+    }
+  }, [searchParams])
 
   const fetchQuotes = async () => {
     try {
@@ -420,5 +434,13 @@ export default function QuotesPage() {
         )}
       </div>
     </Layout>
+  )
+}
+
+export default function QuotesPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <QuotesPageContent />
+    </Suspense>
   )
 }

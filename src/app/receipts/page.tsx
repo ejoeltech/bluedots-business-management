@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Layout from '@/components/Layout'
 import ReceiptPDF from '@/components/ReceiptPDF'
 import CurrencySelector from '@/components/CurrencySelector'
@@ -28,7 +29,8 @@ interface Receipt {
   }
 }
 
-export default function ReceiptsPage() {
+function ReceiptsPageContent() {
+  const searchParams = useSearchParams()
   const [receipts, setReceipts] = useState<Receipt[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -45,6 +47,18 @@ export default function ReceiptsPage() {
     fetchReceipts()
     fetchInvoices()
   }, [])
+
+  // Handle URL parameters to auto-open modal
+  useEffect(() => {
+    const action = searchParams.get('action')
+    if (action === 'create') {
+      setShowModal(true)
+      // Clean up URL without reloading
+      const url = new URL(window.location.href)
+      url.searchParams.delete('action')
+      window.history.replaceState({}, '', url.toString())
+    }
+  }, [searchParams])
 
   const fetchReceipts = async () => {
     try {
@@ -366,5 +380,13 @@ export default function ReceiptsPage() {
         )}
       </div>
     </Layout>
+  )
+}
+
+export default function ReceiptsPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ReceiptsPageContent />
+    </Suspense>
   )
 }

@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Layout from '@/components/Layout'
 import { Plus, Edit, Trash2, Eye, Download } from 'lucide-react'
 
@@ -18,7 +19,8 @@ interface Customer {
   }
 }
 
-export default function CustomersPage() {
+function CustomersPageContent() {
+  const searchParams = useSearchParams()
   const [customers, setCustomers] = useState<Customer[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -33,6 +35,18 @@ export default function CustomersPage() {
   useEffect(() => {
     fetchCustomers()
   }, [])
+
+  // Handle URL parameters to auto-open modal
+  useEffect(() => {
+    const action = searchParams.get('action')
+    if (action === 'create') {
+      setShowModal(true)
+      // Clean up URL without reloading
+      const url = new URL(window.location.href)
+      url.searchParams.delete('action')
+      window.history.replaceState({}, '', url.toString())
+    }
+  }, [searchParams])
 
   const fetchCustomers = async () => {
     try {
@@ -317,5 +331,13 @@ export default function CustomersPage() {
         )}
       </div>
     </Layout>
+  )
+}
+
+export default function CustomersPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <CustomersPageContent />
+    </Suspense>
   )
 }

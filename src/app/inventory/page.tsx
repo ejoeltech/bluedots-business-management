@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Layout from '@/components/Layout'
 import CurrencySelector from '@/components/CurrencySelector'
 import { Plus, Edit, Trash2, Package, TrendingUp, TrendingDown } from 'lucide-react'
@@ -19,7 +20,8 @@ interface Product {
   }
 }
 
-export default function InventoryPage() {
+function InventoryPageContent() {
+  const searchParams = useSearchParams()
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -35,6 +37,18 @@ export default function InventoryPage() {
   useEffect(() => {
     fetchProducts()
   }, [])
+
+  // Handle URL parameters to auto-open modal
+  useEffect(() => {
+    const action = searchParams.get('action')
+    if (action === 'create') {
+      setShowModal(true)
+      // Clean up URL without reloading
+      const url = new URL(window.location.href)
+      url.searchParams.delete('action')
+      window.history.replaceState({}, '', url.toString())
+    }
+  }, [searchParams])
 
   const fetchProducts = async () => {
     try {
@@ -352,5 +366,13 @@ export default function InventoryPage() {
         )}
       </div>
     </Layout>
+  )
+}
+
+export default function InventoryPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <InventoryPageContent />
+    </Suspense>
   )
 }
