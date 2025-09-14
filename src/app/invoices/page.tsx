@@ -212,6 +212,30 @@ function InvoicesPageContent() {
   return (
     <Layout>
       <div className="px-4 py-6 sm:px-0">
+        {/* Debug button */}
+        <div className="mb-4 p-4 bg-yellow-100 border border-yellow-400 rounded">
+          <p className="text-sm text-yellow-800 mb-2">
+            <strong>Debug Info:</strong> Modal State: {showModal ? 'OPEN' : 'CLOSED'}
+          </p>
+          <button 
+            onClick={() => {
+              console.log('Button clicked, setting modal to true')
+              setShowModal(true)
+            }}
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mr-2"
+          >
+            Test Modal
+          </button>
+          <button 
+            onClick={() => {
+              console.log('Button clicked, setting modal to false')
+              setShowModal(false)
+            }}
+            className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+          >
+            Close Modal
+          </button>
+        </div>
         <div className="sm:flex sm:items-center">
           <div className="sm:flex-auto">
             <h1 className="text-2xl font-semibold text-gray-900">Invoices</h1>
