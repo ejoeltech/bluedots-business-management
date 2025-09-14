@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Layout from '@/components/Layout'
-import Modal from '@/components/Modal'
+import SimpleModal from '@/components/SimpleModal'
 import { Plus, Edit, Trash2, Eye, Download } from 'lucide-react'
 
 interface Customer {
